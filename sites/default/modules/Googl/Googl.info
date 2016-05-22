@@ -1,0 +1,4 @@
+name = Goo.gl Shorten URL
+description = Shorten URL by Goo.gl
+package = "HGH"
+core = 7.x

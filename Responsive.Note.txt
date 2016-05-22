@@ -1,0 +1,4 @@
+Note
+-------------
+1. Move slider into new region: Slider
+2. Disable home menu

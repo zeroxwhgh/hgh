@@ -1,0 +1,658 @@
+<?php
+/**
+ * Implementation of hook_init()
+ */ 
+function custom_blocks_init() {
+	global $base_path;
+	
+	drupal_add_css(drupal_get_path('module', 'custom_blocks') . '/custom_blocks.css');
+	drupal_add_js(drupal_get_path('module', 'custom_blocks') . '/custom_blocks.js');
+}
+
+function custom_blocks_mollom_form_list() {
+	$forms['inquire_form'] = array(
+		'title' => t('Inquiry Form'),
+	);
+	
+	return $forms;
+}
+
+function custom_blocks_mollom_form_info() {
+	$form_info = array(
+		'mode' => MOLLOM_MODE_ANALYSIS,
+	);
+	
+	return $form_info;
+}
+
+/**
+ * Implementation of hook_theme()
+ */
+function custom_blocks_theme() {
+	return 
+		array(
+			'support_online' => array(
+				'arguments' => array('var' => NULL),
+				'template' => 'support_online',
+			),
+			'main_menu_items' => array(
+				'arguments' => array('var' => NULL),
+				'template' => 'main_menu_items',
+			),
+			'header_search_block' => array(
+				'arguments' => array('var' => NULL),
+				'template' => 'header_search_block',
+			)
+			
+		);
+}
+
+function custom_blocks_block_info() {
+	$blocks = array();
+	
+	$blocks['support_online'] = array(
+		'info' => t('HGH - Support Online'),
+		'status' => 0
+	);
+	
+	$blocks['why_us'] = array(
+		'info' => t('HGH - Why Us?'),
+		'status' => 0
+	);
+	
+	$blocks['main_menu_items'] = array(
+		'info' => t('Main Menu Items Block'),
+		'status' => 0
+	);
+	
+	$blocks['explore_map'] = array(
+		'info' => t('Explore Map Block'),
+		'status' => 0
+	);
+	
+	$blocks['header_search_block'] = array(
+		'info' => t('Header Search Block'),
+		'status' => 0
+	);
+	
+	// search block on homepage
+	$blocks['search_content'] = array(
+		'info' => t('Search Tours/Hotels'),
+		'status' => 0
+	);
+	
+	$blocks['tabbed_content'] = array(
+		'info' => t('Tabbed Contents'),
+		'status' => 0
+	);
+	
+	$blocks['footer_content'] = array(
+		'info' => t('Footer Content'),
+		'status' => 0
+	);
+
+	$blocks['tour_stype_similar'] = array(
+		'info' => t('Tour Style Similar'),
+		'status' => 0
+	);
+	
+	return $blocks; 	
+}
+
+function custom_blocks_block_view($delta = '') {
+	switch ($delta) {
+		case 'support_online':
+			$block = array(
+				'subject' => "<none>",
+				'content' => block_support_online_content()
+			);
+			break;
+			
+		case 'why_us':
+			$block = array(
+				'subject' => "<none>",
+				'content' => block_why_us_content()
+			);
+			break;
+		
+		case 'main_menu_items':
+			$block = array(
+				'subject' => "<none>",
+				'content' => block_main_menu_items_content()
+			);
+			break;
+			
+		case 'header_search_block':
+			$block = array(
+				'subject' => "<none>",
+				'content' => theme('header_search_block')
+			);
+			break;
+		
+		case 'explore_map':
+			$block = array(
+				'subject' => "<none>",
+				'content' => block_explore_map_content()
+			);
+			break;
+			
+		case 'search_content':
+			$block = array(
+				'subject' => "<none>",
+				'content' => block_search_content()
+			);
+		break;
+				
+		case 'tabbed_content':
+			$block = array(
+				'subject' => "<none>",
+				'content' => block_tabbed_content()
+			);
+		break;
+		
+		case 'footer_content':
+			$block = array(
+				'subject' => "<none>",
+				'content' => block_footer_content()
+			);
+		break;
+		
+		case 'tour_stype_similar':
+			$title = '<none>';
+			if (arg(0) == "node" && is_numeric(arg(1))) {
+				$n = node_load(arg(1));
+				if ($n->type == "tour") {
+					//$title = 'Similar Style: '. $n->field_style['und'][0]['taxonomy_term']->name;
+				}
+			}
+
+			$block = array(
+				'subject' => $title,
+				'content' => block_tour_stype_similar_content()
+			);
+		break;
+
+		default:
+			$block = array(
+				'subject' => '<none>',
+				'content' => theme($delta),
+			);
+	}
+	
+	return $block;
+}
+// =================================
+// Blocks Content
+// =================================
+/**
+ * Implementation of hook_query_TAG_alter
+ */
+function custom_blocks_query_random_alter($query) {
+  $query->orderRandom();
+}
+
+function block_tour_stype_similar_content() {
+	global $base_path;
+	$html = false;
+
+	if (arg(0) == "node" && is_numeric(arg(1))) {
+		$n = node_load(arg(1));
+		if ($n->type == "tour") {
+			$html = "";
+			$query = new EntityFieldQuery();
+				$tours = $query->entityCondition('entity_type', 'node')
+				->entityCondition('bundle', 'tour')
+				->fieldCondition('field_style', 'tid', $n->field_style['und'][0]['tid'], '=')
+				->propertyCondition('status', 1)
+				->addTag('random')
+				->range(0, 5)
+				->execute();
+			$nodes = node_load_multiple(array_keys($tours['node']));
+			
+			foreach($nodes as $n) {
+				$path = drupal_get_path_alias('node/'.$n->nid);
+				$thumbnail = image_style_url('tour_thumbnail_small', $n->field_thumbnail[LANGUAGE_NONE][0]['uri']);
+				$html .= '<div class="item">
+					<img src="'.$thumbnail.'" class="thumbnail" />
+					<a href="/'.$path.'">'.$n->title.'</a>
+				</div>';
+			}
+		}
+	}
+
+	return $html;
+}
+
+function block_footer_content() {
+	global $base_path;
+	$theme_path = drupal_get_path('theme', 'adaptivetheme_hgh');
+
+	$html = '<div class="footer-content">
+		<div class="links">
+			<div class="quick-links">
+				<span class="title">'.t('Quick Links').'</span> 
+				<ul>
+					<li><a href="'.$base_path.'">'.t('Home').'</a>
+					<li><a href="'.$base_path.'destinations">'.t('Destinations').'</a>
+					<li><a href="'.$base_path.'tours">'.t('Tours').'</a>
+					<li><a href="'.$base_path.'hotels">'.t('Hotels & Resorts').'</a>
+					<li><a href="'.$base_path.'about-us">'.t('About Us').'</a>
+				<ul>
+			</div>
+			<div class="destinations-links">
+				<span class="title">'.t('OUR HGH Travel').'</span> 
+				<ul>
+					<li><a href="'.$base_path.'destinations/vietnam">'.t('Vietnam').'</a>
+					<li><a href="'.$base_path.'destinations/laos">'.t('Laos').'</a>
+					<li><a href="'.$base_path.'destinations/cambodia">'.t('Cambodia').'</a>
+					<li><a href="'.$base_path.'destinations/myanmar">'.t('Myanmar').'</a>
+					<li><a href="'.$base_path.'destinations/thailand">'.t('Thailand').'</a>
+				<ul>
+			</div>
+			<div class="about-links">
+				<span class="title">'.t('About Our HGH Travel').'</span> 
+				<ul>
+					<li><a href="'.$base_path.'how-we-do-business">'.t('How we do business').'</a>
+					<li><a href="'.$base_path.'hgh-travel-supporting-its-communities-and-heritage">'.t('HGH Travel supporting its communities and heritage').'</a>
+					<li><a href="'.$base_path.'why-choosing-hgh-travel-best-choice-customers">'.t('Why choosing HGH Travel is the best choice for consumer').'</a>
+					<li><a href="'.$base_path.'our-locations">'.t('Our locations').'</a>
+					<li><a href="'.$base_path.'career">'.t('Career').'</a>
+				<ul>
+			</div>
+			<div class="info-links">
+				<ul>
+					<li class="tel">'.t('Telephone').': +(84) 54 3 932 789</li>
+					<li><a href="mailto:info@hghue.com">info@hghue.com</a></li>
+				<ul>
+				
+				<div class="contact" style="">
+					<div class="yahoo"><a href="ymsgr:sendIM?laithiquynhchi"><img src="'.$base_path.$theme_path.'/images/yahoo.png" width="48" /></a></div>
+					<div class="skype"><a href="skype:chilai121?call"><img src="'.$base_path.$theme_path.'/images/skype.png" width="48" /></a></div>
+					<div id="TA_virtualsticker198" class="TA_virtualsticker" style="position: relative; left:-15px; top: 10px;"><ul id="z2xdqzEn" class="TA_links QOSjXRSsdbB3" ><li id="5cjq3aHP7nK" class="O5QQuaxrLW"><a target="_blank" href="http://www.tripadvisor.com/"><img src="http://www.tripadvisor.com/img/cdsi/img2/branding/tripadvisor_sticker_logo_88x55-18961-2.png" alt="TripAdvisor"/></a></li></ul></div><script src="http://www.jscache.com/wejs?wtype=virtualsticker&uniq=198&lang=en_US&locationId=8262330&display_version=2"></script>
+				</div>
+			</div>
+		</div>
+		<div class="clearfix"></div>
+
+		<div class="partner-logo-title">'.t('Member of').'</div>
+		<div class="partner-logo">
+			<a><img src="'.$base_path.$theme_path.'/images/hiephoiluhanh.jpg" width="120" /></a>
+			<a href="http://www.pata.org/" target="_blank"><img src="'.$base_path.$theme_path.'/images/www.pata.org.png" width="100" /></a>
+		</div>
+	</div>'; //<li><a href="ymsgr:sendIM?copaine910">Yahoo</a> | <a href="skype:baochau_91085?call">Skype</a></li> 
+	// <a><img src="'.$base_path.$theme_path.'/images/www.asr-berlin.de.jpg" width="150" /></a>
+	
+	return $html;
+}
+
+// tabbed content on home page
+function block_tabbed_content() {
+	global $base_path;
+	
+	$last_viewed = false;
+	if (!empty($_SESSION['last_viewed'])) {
+		if (count($_SESSION['last_viewed'] > 0)) {
+			$last_viewed = true;
+		}
+	}
+	
+	$html = '<div class="tabbed-content-wrapper featured-tours">';
+	$html .= '<div class="tabs">
+			<div id="destinations-tab" class="text tab-selected">'.t("What's New").'</div>';
+	if ($last_viewed) {
+		$html .= '<div id="last-viewed-tab" class="text tab">'.t('Your Recent Visits').'</div>';
+	}
+	
+	$query = new EntityFieldQuery();
+	$hot_destinations = $query->entityCondition('entity_type', 'node')
+			->entityCondition('bundle', 'tour')
+			->fieldCondition('field_hot_destinations', 'value', 1, '=')->execute();
+	$nodes = node_load_multiple(array_keys($hot_destinations['node']));
+	
+	$html .= '	<div class="clear"></div></div>
+		<div class="content">
+		<div id="foot-destinations-content">';
+	$html .= '<div class="contentSlidecontainer">
+	<div class="prevcontainer">
+		<div class="prev"> </div>
+	</div>
+	<div class="contentSlidewindow featured-content">
+	<div class="contentSlidewrapper" data-slidesperpage="3">';
+	foreach ($nodes as $node) {
+		$alias = drupal_get_path_alias('node/'.$node->nid);
+		$thumbnail = image_style_url('tour_thumbnail_medium', $node->field_thumbnail[LANGUAGE_NONE][0]['uri']);
+		$html .= '<div class="item contentSlide"><a href="'.$base_path.$alias.'"><img src="'.$thumbnail.'" class="tour-thumbnail" /></a>
+			<div class="tour-title">'.l($node->title, 'node/'.$node->nid).'</div></div>';
+	}
+	
+	$html .= '</div>'; // contentSlidewrapper
+	$html .= '</div>'; // contentSlidewindow
+	
+	$html .= '<div class="nextcontainer"><div class="next"> </div></div>';
+	$html .= '<div class="clear"></div>';
+	$html .= '<div class="pagingcontainer"></div><div class="clear"></div>';
+	$html .= '</div></div>'; // #foot-last-viewed-content
+	$html .= '<div class="clear"></div>';
+	
+	// --------------------
+	// last viewed nodes	
+	if ($last_viewed) {
+		// dpm($_SESSION['last_viewed']);
+		$nodes = node_load_multiple(array_reverse($_SESSION['last_viewed']));
+		$html .= '<div id="foot-last-viewed-content">';		
+		$html .= '<div class="contentSlidecontainer">
+		<div class="prevcontainer">
+			<div class="prev"> </div>
+		</div>
+		<div class="contentSlidewindow featured-content">
+		<div class="contentSlidewrapper" data-slidesperpage="3">';
+		foreach ($nodes as $node) {
+			$alias = drupal_get_path_alias('node/'.$node->nid);
+			$thumbnail = image_style_url('tour_thumbnail_medium', $node->field_thumbnail[LANGUAGE_NONE][0]['uri']);
+			$html .= '<div class="item contentSlide"><a href="'.$base_path.$alias.'"><img src="'.$thumbnail.'" class="tour-thumbnail" /></a>
+				<div class="tour-title">'.l($node->title, 'node/'.$node->nid).'</div></div>';
+		}
+		
+		$html .= '</div>'; // contentSlidewrapper
+		$html .= '</div>'; // contentSlidewindow
+		
+		$html .= '<div class="nextcontainer"><div class="next"> </div></div>';
+		$html .= '<div class="clear"></div>';
+		$html .= '<div class="pagingcontainer"></div><div class="clear"></div>';
+		$html .= '</div></div>'; // #foot-last-viewed-content
+		$html .= '<div class="clear"></div>';
+	}
+	// --------------------
+	
+	$html .= '</div>';
+	
+	return $html;
+}
+
+function block_support_online_content() {
+	global $base_path;
+	$theme_path = drupal_get_path('theme', 'adaptivetheme_hgh');
+	
+	$html = '<div class="support-online-block">
+		<div class="title">'.t('Contact us').'</div>
+		<div class="phone">'.t('Hotline').': +(84) 54 3 932 789</div>
+		<div class="yahoo"><a href="ymsgr:sendIM?copaine910"><img src="'.$base_path.$theme_path.'/images/yahoo.png" width="90" /></a></div>
+		<div class="skype"><a href="skype:baochau_91085?call"><img src="'.$base_path.$theme_path.'/images/skype.png" width="90" /></a></div>
+		<div class="clear"></div>
+	</div>';	
+	
+	return $html;
+}
+
+// search tour/hotel on homepage
+function block_search_content() {
+	global $language;
+	// ===================
+	// country
+	$country_voc = taxonomy_get_tree(2);
+	$country_list = '<select id="search-country" name="search-country" class="search-country">';
+	$country_list .= '<option value="all">'.t('All Countries').'</option>';
+	foreach ($country_voc as $term) {
+		$country_list .= '<option value="'._clean_url($term->name).'">'.i18n_taxonomy_term_name($term, $language->language).'</option>';
+	}
+	$country_list .= '</select>';
+	
+	// ===================
+	// city
+	$city_voc = taxonomy_get_tree(3);
+	$city_list = '<select id="search-city" name="search-city" class="search-city">';
+	$city_list .= '<option value="all">'.t('All Cities').'</option>';
+	$city_list .= '</select>';
+	
+	$duration_list = '<select id="search-duration" class="form-select" name="search-duration">
+		<option selected="selected" value="all">'.t('All Durations').'</option>
+		<option value="1-2">1-2</option>
+		<option value="3-4">3-4</option>
+		<option value="5-6">5-6</option>
+		<option value="7-8">7-8</option>
+		<option value="9-10">9-10</option>
+		<option value="10">'.t('More Than 10 Days').'</option>
+	</select>';
+	
+	$tour_style_voc = taxonomy_get_tree(4);
+	$style_list = '<select id="search-style" class="form-select" name="search-style">
+	<option selected="selected" value="all">'.t('All Styles').'</option>';
+	foreach ($tour_style_voc as $term) {
+		$style_list .= '<option value="'._clean_url($term->name).'">'.i18n_taxonomy_term_name($term, $language->language).'</option>';
+	}
+	$style_list .= '</select>';
+	
+	$hotel_type_list = '<select id="search-hotel-type" class="form-select" name="search-hotel-type">
+		<option selected="selected" value="all">'.t('All Types').'</option>';
+		$hotel_type_voc = taxonomy_get_tree(5);
+		foreach ($hotel_type_voc as $term) {	
+			$hotel_type_list .= '<option value="'._clean_url($term->name).'">'.i18n_taxonomy_term_name($term, $language->language).'</option>';
+		}
+	$hotel_type_list .= '</select>';
+	
+	// ===================
+	// block content
+	$html = '<div class="search-content">
+		<div class="tabs">
+			<div class="text search-more">'.t('SEARCH FOR MORE').'</div>
+			<div class="text tab-selected" id="tours-tab">'.t('Tours').'</div>
+			<div class="text tab" id="hotels-tab">'.t('Hotels').'</div>
+			<div class="clear"></div>
+		</div>
+		<div class="search-control">
+			<div class="country form-item"><label for="search-country">'.t('Select a Country').'</label>'.$country_list.'</div>
+			<div class="city form-item"><label for="search-city">'.t('Select a City').'</label>'.$city_list.'</div>
+			<div class="duration form-item"><label for="search-duration">'.t('Duration').'</label>'.$duration_list.'</div>
+			<div class="hotel-type form-item"><label for="hotel-type">'.t('Hotel Type').'</label>'.$hotel_type_list.'</div>
+			<div class="style form-item"><label for="search-style">'.t('Style').'</label>'.$style_list.'</div>
+			<div class="form-submit"><input type="button" id="search-content-submit" value="'.t('Search').'" class="" />
+			<input type="hidden" id="search-type" value="tour" />
+			</div>
+			<div class="clear"></div>
+		</div>
+	</div>';
+	
+	return $html;
+}
+
+// expore map/left column
+function block_explore_map_content() {
+	global $base_path;
+	$theme_path = drupal_get_path('theme', 'adaptivetheme_hgh');
+	
+	$output = '<div class="explore-map">
+		<a href="'.$base_path.'destinations"><img src="'.$base_path.$theme_path.'/images/explore-map.png" /></a>
+		<span class="text">'.t('View your destinations on map').'</span>
+	</div>';
+	
+	return $output;
+}
+
+// main menu content items
+function block_main_menu_items_content() {
+	global $base_path;
+	$country_voc = taxonomy_get_tree(2);
+	
+	$output = '<div id="links-menu">';
+	// Destinations	
+	$output .= _destinations_menu_links($country_voc);
+	// Tours lists	
+	$output .= _tours_menu_links($country_voc);
+	$output .= '</div>'; // main-menu-items
+	return $output;
+}
+
+// tours menu items
+function _tours_menu_links($country_voc) {
+	global $base_path, $language;
+	$destinations_path = $base_path.'destinations';
+	$tours_displayed = array();
+	
+	$output = '<div id="tours-list" class="shadow links-list">
+	<div class="menu-list-wrapper">';
+	$output .= '<div class="column-left">';
+	foreach ($country_voc as $term) {
+		$term_name = strtolower($term->name);
+		$term_info = taxonomy_term_load($term->tid);
+		$output .= '<div class="link-item" id="tours-'.$term->name.'">
+			<div class="thumbnail">
+			<img class="thumbnail" src="'.image_style_url('taxonomy_country_thumbnail', $term_info->field_thumbnail[LANGUAGE_NONE][0]['uri']).'" /></div>
+			<div class="links-info">
+				<div class="name"><a href="'.$destinations_path.'/'.$term_name.'">'.i18n_taxonomy_term_name($term, $language->language).' Tours</a></div>
+				<div class="pages">
+					<ul>';
+					// featured tour of each country
+					// this query use field_country in term CITY
+					$query = db_query("SELECT * FROM node n 
+					INNER JOIN field_data_field_feature f ON f.entity_id = n.nid
+					INNER JOIN field_data_field_primary_city pc ON pc.entity_id = n.nid			
+					INNER JOIN taxonomy_index ti ON ti.nid = n.nid
+					INNER JOIN taxonomy_term_data td ON td.tid = ti.tid
+					INNER JOIN field_data_field_country c ON c.entity_id = td.tid
+					WHERE n.type = 'tour' AND f.field_feature_value = 1 AND td.vid = 3
+					AND c.field_country_tid = $term->tid AND pc.field_primary_city_tid = ti.tid");
+					/* need fix					
+					$query = db_query("SELECT * FROM node n 
+					INNER JOIN field_data_field_feature f ON f.entity_id = n.nid
+					INNER JOIN field_data_field_primary_city pc ON pc.entity_id = n.nid			
+					INNER JOIN taxonomy_index ti ON ti.nid = n.nid
+					INNER JOIN taxonomy_term_data td ON td.tid = ti.tid
+					WHERE n.type = 'tour' AND f.field_feature_value = 1 AND td.vid = 3
+					AND td.tid = $term->tid AND pc.field_primary_city_tid = ti.tid");
+					*/
+					$total = 0;
+					foreach ($query as $row) {
+						if ($total < 3) {
+							$output .= '<li>'.l($row->title, 'node/'.$row->nid).'</li>';
+							$tours_displayed[] = $row->nid;
+							$total++;					
+						}
+					}
+
+					$output .=	'</ul>
+				</div>
+			</div>
+		</div>';
+	}
+	$output .= '</div>';
+	$output .= '<div class="column-right most-popular-links">
+	<div class="title">'.t('Most Popular Tours').'</div>';
+	
+	$ignore_nodes = implode(',', $tours_displayed);
+	if ($ignore_nodes) {
+		$sql = "SELECT n.nid, n.title, td.tid FROM node n 
+						INNER JOIN field_data_field_most_popular mp ON mp.entity_id = n.nid
+						INNER JOIN field_data_field_primary_city pc ON pc.entity_id = n.nid
+						INNER JOIN taxonomy_index ti ON ti.nid = n.nid
+						INNER JOIN taxonomy_term_data td ON td.tid = ti.tid
+						WHERE n.type = 'tour' AND mp.entity_type = 'node' AND mp.field_most_popular_value = 1
+						AND pc.field_primary_city_tid = ti.tid AND n.nid NOT IN($ignore_nodes)";
+	} else {
+		$sql = "SELECT n.nid, n.title, td.tid FROM node n 
+						INNER JOIN field_data_field_most_popular mp ON mp.entity_id = n.nid
+						INNER JOIN field_data_field_primary_city pc ON pc.entity_id = n.nid
+						INNER JOIN taxonomy_index ti ON ti.nid = n.nid
+						INNER JOIN taxonomy_term_data td ON td.tid = ti.tid
+						WHERE n.type = 'tour' AND mp.entity_type = 'node' AND mp.field_most_popular_value = 1
+						AND pc.field_primary_city_tid = ti.tid";	
+	}
+	
+	$query = db_query($sql);
+	$total = 0;
+	foreach ($query as $row) {
+		$term_info = taxonomy_term_load($row->tid);
+		$country_name = taxonomy_term_load($term_info->field_country[LANGUAGE_NONE][0]['tid'])->name;
+		$total++;
+		
+		$output .= '<div class="popular-item">
+			<span class="city">'.l($row->title, 'node/'.$row->nid).'</span>
+			<span class="country"><a href="'.$destinations_path.'/'.strtolower($country_name).'">'.$country_name.'</a></span>
+		</div>';
+		if ($total == 5) break;
+	}
+	$output .= '<div class="all-links"><a href="'.$base_path.'tours" class="view-all-links">'.t('All Tours').'</a></div>';
+	$output .= '</div><div class="clearfix"></div>';
+	
+	$output .= '</div>'; // menu list wrapper
+	$output .= '</div>'; // tours list
+	return $output;
+}
+
+function _destinations_menu_links($country_voc) {
+	global $base_path, $language;
+	$destinations_path = $base_path.'destinations/';
+	// ====================================
+	// Destinations lists
+	// ====================================
+	// country
+	$output = '<div id="desinations-list" class="shadow links-list">
+	<div class="menu-list-wrapper">';
+	$output .= '<div class="column-left">';
+	foreach ($country_voc as $term) {
+		$term_name = strtolower($term->name);
+		$term_info = taxonomy_term_load($term->tid);
+		
+		$output .= '<div class="link-item" id="country-'.$term->name.'">
+			<div class="thumbnail">
+			<img class="thumbnail" src="'.image_style_url('taxonomy_country_thumbnail', $term_info->field_thumbnail[LANGUAGE_NONE][0]['uri']).'" /></div>
+			<div class="links-info">
+				<div class="name"><a href="'.$destinations_path.$term_name.'">'.i18n_taxonomy_term_name($term, $language->language).'</a></div>
+				<div class="pages">
+					<ul>
+						<li><a href="'.$destinations_path.$term_name.'/tours">'.t('Tours').'</a></li>
+						<li><a href="'.$destinations_path.$term_name.'/hotels">'.t('Hotels').'</a></li>
+						<li><a href="'.$destinations_path.$term_name.'/inspiration">'.t('Inspiration').'</a></li>
+						<li><a href="'.$destinations_path.$term_name.'/travel-guide">'.t('Travel Guide').'</a></li>
+						<li><a href="'.$destinations_path.$term_name.'/things-todo">'.t('Things to do').'</a></li>
+						<li><a href="'.$destinations_path.$term_name.'/promotion">'.t('Promotion').'</a></li>
+					</ul>
+				</div>
+			</div>
+		</div>';
+	}
+	
+	$output .= '</div>'; // left
+	$output .= '<div class="column-right most-popular-links">
+	<div class="title">'.t('Most Popular Cities').'</div>';
+	$city_voc = taxonomy_get_tree(3);
+	$total = 0;
+	foreach ($city_voc as $term) {
+		$term_info = taxonomy_term_load($term->tid);
+		$city_name = strtolower($term->name);
+
+		if ($term_info->field_most_popular[LANGUAGE_NONE][0]['value']) {
+			$country_name = taxonomy_term_load($term_info->field_country[LANGUAGE_NONE][0]['tid'])->name;
+			
+			$total++;
+			$output .= '<div class="popular-item">
+				<span class="city"><a href="'.$destinations_path.strtolower($country_name).'/'.strtolower($term_info->name).'">'.$term_info->name.'</a></span>
+				<span class="country"><a href="'.$destinations_path.strtolower($country_name).'">'.$country_name.'</a></span>
+			</div>';
+		}
+		
+		if ($total == 5) {
+			break;	
+		}
+	}
+	$output .= '<div class="all-links"><a href="'.$destinations_path.'" class="view-all-links">'.t('Overview All Our Destinations').'</a></div>';
+	
+	$output .= '</div><div class="clearfix"></div>'; // right
+
+	$output .= '</div>'; // menu list wrapper
+	$output .= '</div>'; // destinations list
+	return $output;
+}
+
+function block_why_us_content() {
+	return ' ';	
+}
+
+function _clean_url($key, $type = 'encode') {
+	if ($type == 'encode') {
+		$key = str_replace(' ', '-', strtolower($key));
+	} else {
+		$key = str_replace('-', '', ucwords($key));	
+	}
+	
+	return $key;
+}

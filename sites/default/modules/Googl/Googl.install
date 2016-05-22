@@ -1,0 +1,29 @@
+<?php
+
+function Googl_install(){
+  drupal_install_schema('Googl');
+}
+
+function Googl_uninstall(){
+  drupal_uninstall_schema('Googl');
+}
+
+function Googl_schema(){
+  $schemas['Googl'] = array(
+    'fields' => array(
+      'FullURL' => array(
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => FALSE,
+      ),
+	  'ShortURL' => array(
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => FALSE,
+      )
+    ),
+    'primary key' => array('FullURL'),
+  );
+
+  return $schemas;
+}

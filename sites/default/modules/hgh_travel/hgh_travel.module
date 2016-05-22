@@ -1,0 +1,2352 @@
+<?php
+
+/*
+* ====================================================
+* HGH main pages
+* Destinations, Tours
+* ====================================================
+*/
+
+function hgh_travel_init() {
+	global $language, $base_path;
+	/*
+	if (isset($_GET['language'])) {
+		$languages_allow = array('en', 'fr');
+		if (in_array($_GET['language'], $languages_allow)) {
+   			$expire = REQUEST_TIME + (86400 * 7);
+  			setcookie($param, $_GET['language'], $expire, $base_path);
+		}
+	}
+	*/
+
+	//$theme_path = drupal_get_path('theme', 'adaptivetheme_hgh');
+	$settings['language'] = $language->language;
+	drupal_add_js(array('hgh_travel' => $settings), 'setting');
+	if (isset($_GET['language'])) {
+		drupal_add_js('jQuery(document).ready(function () { setTimeout("location.href=\'http://www.hghtravel.com/'.$_GET['q'].'\';", 1000); });', 'inline');
+	}
+}
+
+function hgh_travel_permission() {
+	return array(
+		'administer custom configuration' => array(
+		'title' => t('Administer HGH Custom Configurations'),
+	)
+  );
+}
+
+function hgh_travel_menu() {
+	/***********************************************
+	Search
+	***********************************************/
+	$items['search/%'] = array(
+		'title' => '',
+		'description' => t('Search'),
+		'page callback' => 'search_page',
+		'page arguments' => array(1),
+		'access arguments' => array('access content'),
+		'type' => MENU_CALLBACK,
+	);
+	
+	
+	/***********************************************
+	Destinations Pages
+	***********************************************/
+	$items['destinations'] = array(
+		'title' => '',
+		'description' => t('Destinations Main Page'),
+		'page callback' => 'destinations_page',
+		'access arguments' => array('access content'),
+		'type' => MENU_CALLBACK,
+	);
+	
+	$items['destinations/%/promotion'] = array(
+		'title' => '',
+		'page arguments' => array(1),
+		'page callback' => 'destinations_content',
+		'access arguments' => array('access content'),
+		'type' => MENU_CALLBACK,
+	);
+	$items['destinations/%/inspiration'] = array(
+		'title' => '',
+		'page arguments' => array(1),
+		'page callback' => 'destinations_content',
+		'access arguments' => array('access content'),
+		'type' => MENU_CALLBACK,
+	);
+	$items['destinations/%/things-todo'] = array(
+		'title' => '',
+		'page arguments' => array(1),
+		'page callback' => 'destinations_content',
+		'access arguments' => array('access content'),
+		'type' => MENU_CALLBACK,
+	);
+	$items['destinations/%/travel-guide'] = array(
+		'title' => '',
+		'page arguments' => array(1),
+		'page callback' => 'destinations_content',
+		'access arguments' => array('access content'),
+		'type' => MENU_CALLBACK,
+	);
+	/***********************************************
+	Tours Pages
+	***********************************************/
+	$items['tours'] = array(
+		'title' => t('Tours'),
+		'description' => t('Tours Page'),
+		'page callback' => 'tours_page',
+		'access arguments' => array('access content'),
+		'type' => MENU_CALLBACK,
+	);
+	
+	/***********************************************
+	Hotels & Resorts Pages
+	***********************************************/
+	$items['hotels'] = array(
+		'title' => t('Hotels & Resorts'),
+		'description' => t('Hotels & Resorts'),
+		'page callback' => 'hotels_page',
+		'access arguments' => array('access content'),
+		'type' => MENU_CALLBACK,
+	);
+	
+	/***********************************************
+	Inquire Pages
+	***********************************************/
+	$items['inquiry'] = array(
+		'title' => t('Inquiries'),
+		'page callback' => 'drupal_get_form',
+		'page arguments' => array('inquire_form'),
+		'access arguments' => array('access content'),
+		'type' => MENU_CALLBACK,
+	);
+	
+	/***********************************************
+	Configuration Pages
+	***********************************************/
+	$items['admin/hgh/configurations'] = array(
+		'title' => t('HGH Configurations'),
+		'page callback' => 'hgh_configurations',
+		'access arguments' => array('administer custom configuration'),
+		'description' => 'HGH Content Configuration'
+	);
+	
+	// inquiry
+	$items['admin/hgh/configurations/inquiries'] = array(
+		'title' => t('HGH Inquiries'),
+		'page callback' => 'hgh_inquiries',
+		'access arguments' => array('administer custom configuration')
+	);
+
+	$items['admin/hgh/configurations/inquiries/%'] = array(
+		'title' => t('HGH Inquiries'),
+		'page callback' => 'hgh_inquiries_info',
+		'page arguments' => array(4),
+		'access arguments' => array('administer custom configuration')
+	);
+	
+	// destinations
+	$items['admin/hgh/configurations/destinations'] = array(
+		'title' => t('Destinations & Tours'),
+		'page callback' => 'hgh_configurations',
+		'access arguments' => array('administer custom configuration')
+	);
+	
+	$items['admin/hgh/configurations/destinations/promotion'] = array(
+		'title' => t('Promotion'),
+		'description' => t('Promotion Content'),
+		'page callback' => 'hgh_configurations_destinations_information',
+		'access arguments' => array('administer custom configuration')
+	);
+
+	$items['admin/hgh/configurations/destinations/things-todo'] = array(
+		'title' => t('Things To Do'),
+		'description' => t('Things To Do Content'),
+		'page callback' => 'hgh_configurations_destinations_information',
+		'access arguments' => array('administer custom configuration')
+	);
+	
+	$items['admin/hgh/configurations/destinations/inspirations'] = array(
+		'title' => t('Inspirations'),
+		'description' => t('Inspirations Content'),
+		'page callback' => 'hgh_configurations_destinations_information',
+		'access arguments' => array('administer custom configuration')
+	);
+	
+	$items['admin/hgh/configurations/destinations/travel-guide'] = array(
+		'title' => t('Travel Guide'),
+		'description' => t('Travel Guide Content'),
+		'page callback' => 'hgh_configurations_destinations_information',
+		'access arguments' => array('administer custom configuration')
+	);
+	
+	
+	/***********************************************
+	Tour content management
+	***********************************************/
+	$items['admin/hgh/tour-management'] = array(
+		'title' => t('Tours Management'),
+		'description' => t('Tours & Tours Day Management'),
+		'page callback' => 'tours_management',
+		'access arguments' => array('administer custom configuration')
+	);
+	
+	/***********************************************
+	Ajax
+	***********************************************/
+	// Get cities of country
+	$items['ajax/get-cities'] = array(
+		'title' => t('Get Cities'),
+		'description' => t('Get Cities'),
+		'page callback' => 'ajax_get_cities',
+		'access arguments' => array('access content'),
+		'type' => MENU_CALLBACK 
+	);
+	
+	// Get Gmap Data
+	$items['map-data/%'] = array(
+		'title' => t('Map Info'),
+		'description' => t('Get Google Map Data'),
+		'page callback' => 'get_map_data',
+		'page arguments' => array(1),
+		'access arguments' => array('access content'),
+		'type' => MENU_CALLBACK,
+	);
+	
+	// Get Gmap Data
+	$items['map-data/%/%/page/%'] = array(
+		'title' => t('Map Info'),
+		'description' => t('Get Google Map Data'),
+		'page callback' => 'destinations_get_map_data',
+		'page arguments' => array(1, 2, 4),
+		'access arguments' => array('access content'),
+		'type' => MENU_CALLBACK,
+	);
+	
+	/***********************************************
+	News Pages
+	***********************************************/
+	$items['news'] = array(
+		'title' => t('News'),
+		'page callback' => 'news_list',
+		'access arguments' => array('access content'),
+		'type' => MENU_CALLBACK,
+	);
+
+	$items['news/general'] = array(
+		'title' => t('News'),
+		'page callback' => 'news_list',
+		'access arguments' => array('access content'),
+		'type' => MENU_CALLBACK,
+		'page arguments' => array(2),
+	);
+
+	$items['news/travel-trade'] = array(
+		'title' => t('News'),
+		'page callback' => 'news_list',
+		'access arguments' => array('access content'),
+		'type' => MENU_CALLBACK,
+		'page arguments' => array(2),
+	);
+	
+	return $items;
+}
+
+/***********************************************
+News List
+***********************************************/
+function news_list($type) {
+	global $language, $base_path;
+	// News type: 76: General, 77 Travel-Trade
+	/*
+	$tid = 76;
+	$view = views_get_view('news');
+	$view->set_display('News');
+	$view->set_arguments(array($tid));
+	$view->execute();
+	$general_news = $view->render();
+	
+	$tid = 77;
+	$view = views_get_view('news');
+	$view->set_display('News');
+	$view->set_arguments(array($tid));
+	$view->execute();
+	$travel_trade_news = $view->render();
+	*/
+	
+	
+
+	if (!isset($type) && $type = "general") {
+		$tid = 76;
+		$tab = '<div class="text tab-selected" id="general-tab-content"><a href="#">'.t('General').'</a></div>
+   			<div class="text" id="travel-trade-tab-content"><a href="/news/travel-trade">'.t('Travel Trade').'</a></div>';
+	} else {
+		$tid = 77;
+		$tab = '<div class="text" id="general-tab-content"><a href="/news">'.t('General').'</a></div>
+   			<div class="text tab-selected" id="travel-trade-tab-content"><a href="#">'.t('Travel Trade').'</a></div>';
+	}
+
+	$query = new EntityFieldQuery();
+	$result = $query->entityCondition('entity_type', 'node')
+	->entityCondition('bundle', 'news')
+	->fieldCondition('field_news_type', 'tid', array($tid), 'IN')
+	->propertyCondition('status', 1)
+	->propertyCondition('language', $language->language, '=')
+	->pager(6)
+	->propertyOrderBy('created', 'DESC')
+	->entityOrderBy('bundle', 'DESC')
+	->execute();
+
+	$nodes = node_load_multiple(array_keys($result['node']));
+	$list = '';
+	foreach ($nodes as $node) {	
+		$teaser = $node->field_teaser[LANGUAGE_NONE][0]['value'];
+		if (isset($node->field_teaser[$language->language][0]['value'])) {
+			$teaser = $node->field_teaser[$language->language][0]['value'];
+		}
+		$item = '<div class="news-rows">
+			<div class="title">'.l($node->title, 'node/'.$node->nid).'</div>';
+		if ($node->field_thumbnail[LANGUAGE_NONE][0]['fid'] > 0) {
+			$thumbnail = image_style_url('tour_thumbnail', $node->field_thumbnail[LANGUAGE_NONE][0]['uri']);
+			$item .= '<div class="thumbnail"><img src="'.$thumbnail.'" class="news-thumbnail"/></div>';
+		}
+		
+		$item .= '<div class="author" style="float:left;margin-right: 10px">'.date('M j, Y', $node->created).' - </div>
+		<div class="author">'.$node->field_author[LANGUAGE_NONE][0]['value'].'</div>
+			<div class="teaser">'.$teaser.'</div>
+		<div class="clearfix"></div></div>';
+		$list .= $item;
+	}
+		
+	$html = '<div class="news-list">
+		<div class="tabs">
+			'.$tab.'
+			<div class="clear"></div>
+		</div>
+        
+        <div class="content">
+    		<div class="general-tab-content">'.$list.'</div>
+		</div>
+	</div>';
+	
+	$html .= theme('pager');
+
+	return $html;
+}
+
+/***********************************************
+Tours Content Management
+***********************************************/
+function tours_management() {
+	if (is_numeric(arg(3))) {
+		$node = node_load(arg(3));
+		if ($node->nid) {
+			$days_nid = array();
+			$tour_title = $node->title;
+			foreach($node->field_tour_day['und'] as $day) {
+				$days_nid[] = $day['nid'];	
+			}
+			
+			$header = array( 
+				array('data' => t('#')), 
+				array('data' => t('Day')),
+				array('data' => t('Created')),
+				array('data' => t('-'))
+			);
+			
+			$rows = array();
+			$index = 0;
+			$tour_days = node_load_multiple($days_nid);
+			foreach ($tour_days as $item) {
+				$day_title = explode(' Day', $item->title);
+				if (isset($day_title[1])) {
+					$day_title = 'Day '.$day_title[1]; 
+				} else {
+					$day_title = str_replace($tour_title . ' - ', '', $item->title);
+				}
+					
+				$rows[$index] = array(
+					array('data' => ($index+1)),
+					array('data' => l($day_title, 'node/'.$item->nid, array('attributes' => array('target' => '_blank')))),
+					array('data' => date('d/m/Y h:i:s', $item->created)),
+					array('data' => l(t('Edit'), 'node/'.$item->nid.'/edit', 
+						array('query' => array('destination' => 'destination=admin/hgh/tour-management'))))
+				);
+				$index++;
+			}
+			
+			return theme('table', array('header' => $header, 'rows'=> $rows, 'caption' => ''));
+		} else {
+			drupal_set_message(t("Cannot find tour ID").": ".arg(3));	
+			drupal_goto('admin/hgh/tour-management');
+		}
+	} else {
+		$query = new EntityFieldQuery();
+		$tours = $query->entityCondition('entity_type', 'node')
+		->entityCondition('bundle', 'tour')
+		->pager(20)
+		->execute();
+				
+		$header = array( 
+			array('data' => t('#')), 
+			array('data' => t('Tour')),
+			array('data' => t('Created')),
+			array('data' => t('-'))
+		);
+		
+		$rows = array();
+		$index = 0;
+		$nodes = node_load_multiple(array_keys($tours['node']));
+		foreach ($nodes as $node) {
+			$rows[$index] = array(
+				array('data' => ($index+1)),
+				array('data' => l($node->title, 'node/'.$node->nid, array('attributes' => array('target' => '_blank')))),
+				array('data' => date('d/m/Y h:i:s', $node->created)),
+				array('data' => l(t('Edit'), 'node/'.$node->nid.'/edit', 
+					array('query' => array('destination' => 'destination=admin/hgh/tour-management'))) . ' - ' . l(t("Tour's Days"), 'admin/hgh/tour-management/'.$node->nid))
+			);
+			$index++;
+		}
+		
+		return theme('table', array('header' => $header, 'rows'=> $rows, 'caption' => '')) . theme('pager');
+	}
+}
+
+/***********************************************
+Ajax method
+***********************************************/
+function ajax_get_cities() {
+	$country = arg(2);
+	$tid = 0;
+	if ($country) {
+		$country_voc = taxonomy_get_tree(2);
+		foreach ($country_voc as $term) {
+			if (strtolower($term->name) == ($country)) $tid = $term->tid;
+		}
+		
+		$query = db_query("SELECT * FROM field_data_field_country fc
+			INNER JOIN taxonomy_term_data td ON td.tid = fc.entity_id
+			WHERE fc.field_country_tid = $tid ORDER BY td.name ASC");
+
+		$cities = array();
+		foreach ($query as $row) {
+			$cities[] = array('tid' => _clean_url($row->name), 'name' => $row->name);
+		}
+		echo json_encode($cities);
+	} else {
+		echo json_encode(NULL);
+	}
+}
+
+/***********************************************
+Gmap
+***********************************************/
+function destinations_get_map_data($tid, $type, $page) {
+	global $base_path;
+	/*
+	print $tid.'<br>';
+	print $type.'<br>';
+	print $page.'<br>';
+	*/
+	$json = array();
+	$json['html'] = '';
+	switch($type) {
+		case "tours": {
+			$query = new EntityFieldQuery();
+			$tours = $query->entityCondition('entity_type', 'node')
+			->entityCondition('bundle', 'tour')
+			->fieldCondition('field_country', 'tid', $tid, '=')
+			->propertyCondition('status', 1)
+			->range(($page-1) * 2, 2)
+			->execute();
+			
+			$count_query = new EntityFieldQuery();
+			$count = $count_query->entityCondition('entity_type', 'node')
+			->entityCondition('bundle', 'tour')
+			->fieldCondition('field_country', 'tid', $tid, '=')
+			->propertyCondition('status', 1)
+			->count()
+			->execute();
+			
+			$nodes = node_load_multiple(array_keys($tours['node']));
+			$json['currentpage'] = $page;
+			$json['totalpages'] = round($count / 2);
+			
+			$index = 'first';
+			foreach ($nodes as $node) {
+				$thumbnail = image_style_url('tour_thumbnail', $node->field_thumbnail[LANGUAGE_NONE][0]['uri']);
+				$node_path = drupal_get_path_alias('node/'.$node->nid);
+            
+				$json['html'] .= '<div class="map-tour map-'.$index.'">
+					<div class="floatleft map-item-image-wrapper">
+						<div class="image"><img src="'.$thumbnail.'" class="tour-thumbnail"/></div>
+					</div>
+					
+					<div class="floatleft map-item-desc-wrapper">
+						<div class="item title">'.l($node->title, 'node/'.$node->nid).'</div>
+						<div class="floatleft items-left">
+							<label>'.t('DURATION').'</label>
+							<div class="item duration">
+								<div class="daynight">'.$node->field_day[LANGUAGE_NONE][0]['value'].' '.t('DAYS').' / '.$node->field_night[LANGUAGE_NONE][0]['value'].' '.t('NIGHTS').'</div>
+							</div>
+						</div>
+					
+						<div class="floatleft items-right">
+							<div class="floatleft map-item-links-wrapper">
+								<div class="map-item-link"><a href="'.$base_path.'inquiry/'.$node_path.'" class="btn orange-btn" target="_blank;" >&nbsp;'.t('INQUIRE').'&nbsp;</a></div>
+								<div class="map-item-link"><a class="floatright btn orange-btn" target="_blank;" href="'.$base_path.$node_path.'">'.t('VIEW TOUR').'</a></div>
+							</div>
+						</div>
+					</div>
+					<div class="clear"></div>
+				</div>';
+				
+				$index = 'second';
+			}
+		} break;
+		// end of tours
+		
+		case "hotels": {
+			$query = new EntityFieldQuery();
+			$hotels = $query->entityCondition('entity_type', 'node')
+			->entityCondition('bundle', 'hotel')
+			->fieldCondition('field_country', 'tid', $tid, '=')
+			->propertyCondition('status', 1)
+			->range(($page-1) * 2, 2)
+			->execute();
+			
+			$count_query = new EntityFieldQuery();
+			$count = $count_query->entityCondition('entity_type', 'node')
+			->entityCondition('bundle', 'hotel')
+			->fieldCondition('field_country', 'tid', $tid, '=')
+			->propertyCondition('status', 1)
+			->count()
+			->execute();
+			
+			$nodes = node_load_multiple(array_keys($hotels['node']));
+			$json['currentpage'] = $page;
+			$json['totalpages'] = round($count / 2);
+			
+			$index = 'first';
+			foreach ($nodes as $node) {
+				$thumbnail = image_style_url('tour_thumbnail', $node->field_thumbnail[LANGUAGE_NONE][0]['uri']);
+				$node_path = drupal_get_path_alias('node/'.$node->nid);
+            					
+				$star = '';
+				if (isset($node->field_star)) {
+					$hotel_star = _hotel_star($node->field_star[LANGUAGE_NONE][0]['value']);				
+					for ($i = 0; $i < $hotel_star; $i++) {
+						if ($i == 0) $star .= '<span class="first star"></span>';
+						else $star .= '<span class="star"></span>';	
+					}
+				}
+				
+				$json['html'] .= '<div class="map-tour map-'.$index.'">
+					<div class="floatleft map-item-image-wrapper">
+						<div class="image"><img src="'.$thumbnail.'" class="tour-thumbnail"/></div>
+					</div>
+					
+					<div class="floatleft map-item-desc-wrapper">
+						<div class="item title">'.l($node->title, 'node/'.$node->nid). $star .'</div>
+						<div class="floatleft items-left">
+							<label>'.t('Class').': </label>
+							<div class="item duration">
+								<div class="daynight">'._hotel_class($node->field_star['und'][0]['value']).'</div>
+							</div>
+						</div>
+					
+						<div class="floatleft items-right">
+							<div class="floatleft map-item-links-wrapper">
+								<a class="floatright view-link" target="_blank;" href="'.$base_path.$node_path.'">'.t('VIEW HOTEL').'<span class="readmore"></span></a>
+							</div>
+						</div>
+					</div>
+					<div class="clear"></div>
+				</div>';
+				
+				$index = 'second';
+			}
+		} break;
+	}
+	
+	$content_array = array('inspirations', 'promotion', 'travelguide', 'thingstodo');
+	if (in_array($type, $content_array)) {
+		if ($type == 'travelguide') $type = 'travel-guide';
+		if ($type == 'thingstodo') $type = 'things-todo';
+		
+		$term_info = taxonomy_term_load($tid);
+		$country = strtolower($term_info->name);
+		$content = variable_get(ucwords($country).'-'.$type);
+		if ($content['value']) $json['html'] = '<div class="content">'.$content['value'].'</div>';
+	}
+	// return $json['html'];
+	print json_encode($json);
+}
+
+function get_map_data($type) {
+	global $base_path, $language;
+	$theme_path = drupal_get_path('theme', 'adaptivetheme_hgh');
+	
+	$json = array();
+	
+	// =================================
+	// map tours
+	// =================================
+	if ($type == 'tours') {
+		$nid = arg(2);
+		$node = node_load($nid);
+
+		$json['title'] = $node->title;
+		
+		if ($node->field_location) {
+			// get tour day
+			$tour_day = array();
+
+			$tour_day = $node->field_tour_day[LANGUAGE_NONE];
+			if (isset($node->field_tour_day[$language->language])) {
+				$tour_day = $node->field_tour_day[$language->language];
+			}
+
+			foreach ($tour_day as $day) {
+				$tour_day[] = $day['nid'];
+			}
+			
+			$tour_day_list = node_load_multiple($tour_day);
+			
+			$index = 0;
+
+			$location = $node->field_location[LANGUAGE_NONE];
+			if (isset($node->field_location[$language->language])) {
+				$location = $node->field_location[$language->language];
+			}
+
+			foreach($location as $item) {
+				$json['tours'][$index]['order'] = ($index + 1);
+				$json['tours'][$index]['pos']['lat'] = $item['latitude'];
+				$json['tours'][$index]['pos']['long'] = $item['longitude'];
+				$json['tours'][$index]['title'] = $item['name'];
+				$json['tours'][$index]['label'] = $item['name'];
+				
+				$tour_day_nid = $node->field_tour_day[LANGUAGE_NONE][$index]['nid'];
+				$json['tours'][$index]['image'] = file_create_url($tour_day_list[$tour_day_nid]->field_thumbnail[LANGUAGE_NONE][0]['uri']);
+
+				$summary = $tour_day_list[$tour_day_nid]->body[LANGUAGE_NONE][0]['summary'];
+				if (isset($tour_day_list[$tour_day_nid]->body[$language->language][0]['summary'])) {
+					$summary = $tour_day_list[$tour_day_nid]->body[$language->language][0]['summary'];
+				}
+
+				$json['tours'][$index]['desc'] = $summary;
+				$json['tours'][$index]['opts'] = '';
+				$index++;
+			}
+			
+			$json['icons']['icon'] = $base_path.$theme_path.'/images/map-marker.png';
+			$json['icons']['over'] = $base_path.$theme_path.'/images/map-marker-over.png';
+			$json['icons']['shadow'] = $base_path.$theme_path.'/images/map-marker-shadow.png';
+		}
+	}
+	// =================================
+	// map destinations
+	// =================================
+	else if ($type == 'destinations') {
+		$json['title'] = 'Destinations';
+		$json['icons']['icon'] = $base_path.$theme_path.'/images/marker.png';
+		$json['icons']['over'] = $base_path.$theme_path.'/images/marker_over.png';
+		$json['icons']['shadow'] = $base_path.$theme_path.'/images/marker-number-shadow.png';
+		
+		/*
+		$query = db_query("SELECT * FROM node n 
+			INNER JOIN field_data_field_country c ON c.entity_id = n.nid
+            INNER JOIN taxonomy_index ti ON ti.nid = n.nid
+			INNER JOIN taxonomy_term_data td ON td.tid = ti.tid            
+			WHERE n.type = 'tour' and td.vid = 2 ORDER BY td.name DESC");
+		*/
+		
+		$query = new EntityFieldQuery();
+		$all_tours = $query->entityCondition('entity_type', 'node')
+		->entityCondition('bundle', 'tour')
+		->execute();
+		
+		if (count($all_tours)) {	
+			$nodes = node_load_multiple(array_keys($all_tours['node']));
+			// country lat/long
+			$pos['vietnam'] = array('lat' => 21.022983, 'long' => 105.85876499999995);
+			$pos['laos'] = array('lat' => 19.89072302399691, 'long' => 102.568359375);
+			$pos['thailand'] = array('lat' => 15.771109173575292, 'long' => 101.6455078125);
+			$pos['myanmar'] = array('lat' => 21.350781150679737, 'long' => 96.536865234375);
+			$pos['cambodia'] = array('lat' => 11.501556900932485, 'long' => 104.94140625);
+			
+			$country_array = array(1 => 'vietnam', 2 => 'cambodia', 3 => 'laos', 4 => 'thailand', 5 => 'myanmar');
+			$country_flip = array_flip($country_array);
+			
+			$countries = array();
+			$countries['vietnam']['tours'] = 0; // 1: vietnam
+			$countries['cambodia']['tours'] = 0; // 2: cambodia
+			$countries['laos']['tours'] = 0; // 3: laos
+			$countries['thailand']['tours'] = 0; // 4: thailand
+			$countries['myanmar']['tours'] = 0; // 5: Myanmar
+			
+			foreach ($nodes as $row) {
+				/*
+				print '<pre>';
+				var_dump($row);
+				print '</pre>';
+				*/
+				
+				foreach ($row->field_country['und'] as $term_country) {
+					// country name
+					$name = strtolower($country_array[$term_country['tid']]);
+					// total tour
+					$countries[$name]['tours'] += 1;
+				}
+			}
+		
+			$json['countries'] = array();
+			$index = 0;
+			
+			foreach ($countries as $key => $val) {
+				if ($val['tours'] > 0) {
+					$json['countries'][$index]['pos']['lat'] = $pos[$key]['lat'];
+					$json['countries'][$index]['pos']['long'] = $pos[$key]['long'];
+					$json['countries'][$index]['tours'] = $val['tours'];
+					
+					$json['countries'][$index]['label'] = ucwords($key);
+					$json['countries'][$index]['title'] = ucwords($key);
+					$json['countries'][$index]['tid'] = $country_flip[$key];
+					$index++;
+				}
+			}			
+		}
+	}
+	
+	$json = json_encode($json);
+	// dpm($json);
+	print $json;
+}
+
+/***********************************************
+Search Content
+***********************************************/
+
+function search_page($type) {
+	if ($type == 'all') {
+		$html = '<h4 class="head-title">Search Result</h4>';
+	} else {
+		$html = '<h4 class="head-title">'.strtoupper($type).' '.t('Search Result').'</h4>';
+	}
+	$html .= '<div class="search-content">';
+	
+	if ($type == 'all') {
+		/*
+		if (arg(2)) {
+			$query = new EntityFieldQuery();
+			$query->entityCondition('entity_type', 'node')
+			->entityCondition('bundle', array('tour', 'hotel'), 'IN')
+			->entityOrderBy('bundle', 'DESC')
+			->propertyCondition('status', 1)
+			->propertyCondition('title', "%".arg(2)."%","LIKE")
+			->propertyCondition('title', "%".arg(2)."%","LIKE")
+			->pager(10);
+			$query->propertyOrderBy('created', 'DESC');
+			$result = $query->execute();
+			dpm($result);
+			$html .= '<div class="hotels-tab-content">';
+			if (isset($result['node'])) {
+				$nodes = node_load_multiple(array_keys($result['node']));
+				$total = count($nodes);
+				$index = 0;
+				foreach ($nodes as $node) {
+					if ($node->type == "tour") {
+						$html .= search_render_tour($node, $total, $index);
+					} else {
+						$html .= search_render_hotel($node, $total, $index);
+					}
+					$index++;
+				}
+			} else {
+				$html .= '<div class="notice">There are no result match your term!</div>';
+			}
+			
+			$html .= '<div class="clear"></div>';
+			$html .= '</div>';
+			$html .= theme('pager');
+		} else {
+			$html .= '<div class="hotels-tab-content">';
+			$html .= '<div class="notice">There are no result match your term!</div>';
+			$html .= '<div class="clear"></div>';
+			$html .= '</div>';
+		}
+		*/
+	}
+	
+	// ============================================
+	// search tour
+	if ($type == 'tour') {
+		$query = new EntityFieldQuery();	
+		$query->entityCondition('entity_type', 'node')
+		->entityCondition('bundle', 'tour')
+		->propertyCondition('status', 1)
+		->pager(10);
+		
+		// country
+		if (arg(2) && arg(2) != 'all') {
+			$country_term = taxonomy_get_term_by_name(arg(2));
+			if (count($country_term) > 0) {
+				foreach($country_term as $term) {
+					if (strtolower($term->name) == arg(2)) {
+						$query->fieldCondition('field_country', 'tid', $term->tid, '=');
+						break;
+					}
+				}
+			}	
+		}
+		
+		// city
+		if (arg(3) && arg(3) != 'all') {
+			$city_arg = str_replace('-', ' ', arg(3));
+			$city_term = taxonomy_get_term_by_name($city_arg);
+			if (count($city_term) > 0) {
+				foreach($city_term as $term) {
+					if (strtolower($term->name) == $city_arg) {
+						$query->fieldCondition('field_city', 'tid', $term->tid, '=');
+						break;
+					}
+				}
+			}
+		}
+		
+		// duration
+		if (arg(4) != 'all') {
+			if (arg(4) != '10+') {
+				$days = explode('-', arg(4));
+				if (isset($days[0])) {
+					$query->fieldCondition('field_day', 'value', $days[0], '>=');
+				}
+				
+				if (isset($days[1])) {
+					$query->fieldCondition('field_day', 'value', $days[1], '<=');
+				}
+			} else {
+				$query->fieldCondition('field_day', 'value', 11, '>=');
+			}
+		}
+		
+		// tour style
+		if (arg(5)) {
+			$selected_style = str_replace('-', ' ', arg(5));
+			$styles = taxonomy_get_tree(4);
+			foreach ($styles as $term) {	
+				if (strtolower($term->name) == $selected_style) {
+					$query->fieldCondition('field_style', 'tid', $term->tid, '=');	
+				}
+			}	
+		}
+		
+		// execute query
+		$query->propertyOrderBy('created', 'DESC');
+		$tours = $query->execute();
+		
+		$html .= '<div class="hotels-tab-content">';
+		if (isset($tours['node'])) {
+			$nodes = node_load_multiple(array_keys($tours['node']));
+			$total = count($nodes);
+			$index = 0;
+			foreach ($nodes as $node) {
+				$html .= search_render_tour($node, $total, $index);
+				$index++;
+			}
+		} else {
+			$html .= '<div class="notice">'.t('There are no result match your term!').'</div>';
+		}
+		
+		$html .= '<div class="clear"></div>';
+		$html .= '</div>';
+		
+		$html .= theme('pager');
+	}
+	// ============================================
+	
+	// ============================================
+	// Search Hotels
+	else if ($type == "hotel") {
+		$query = new EntityFieldQuery();
+		$query->entityCondition('entity_type', 'node')
+		->entityCondition('bundle', 'hotel')
+		->propertyCondition('status', 1)
+		->fieldOrderBy('field_star', 'value', 'DESC')
+		->pager(10);
+		
+		// country
+		if (arg(2) && arg(2) != 'all') {
+			$country_term = taxonomy_get_term_by_name(arg(2));
+			if (count($country_term) > 0) {
+				foreach($country_term as $term) {
+					if (strtolower($term->name) == arg(2)) {
+						$query->fieldCondition('field_country', 'tid', $term->tid, '=');
+						break;
+					}
+				}
+			}	
+		}
+		
+		// city
+		if (arg(3) && arg(3) != 'all') {
+			$city_arg = str_replace('-', ' ', arg(3));
+			$city_term = taxonomy_get_term_by_name($city_arg);
+			if (count($city_term) > 0) {
+				foreach($city_term as $term) {
+					if (strtolower($term->name) == $city_arg) {
+						$query->fieldCondition('field_city', 'tid', $term->tid, '=');
+						break;
+					}
+				}
+			}
+		}
+		
+		if (arg(4) && arg(4) != 'all') {
+			$selected_type = str_replace('-', ' ', arg(4));
+			$_star = _hotel_class_text($selected_type);
+			$query->fieldCondition('field_star', 'value', $_star, '=');
+		}
+		
+		// execute query
+		$query->propertyOrderBy('created', 'DESC');
+		$hotels = $query->execute();
+
+		$html .= '<div class="hotels-tab-content">';
+		if (isset($hotels['node'])) {
+			$nodes = node_load_multiple(array_keys($hotels['node']));
+			$total = count($nodes);
+			$index = 0;
+			foreach ($nodes as $node) {
+				$html .= search_render_hotel($node, $total, $index);
+				$index++;
+			}			
+			
+			$html .= '<div class="clear"></div>';			
+		} else {
+			$html .= '<div class="notice">'.t('There are no result match your term!').'</div>';
+		}
+		
+		$html .= '<div class="clear"></div>';
+		$html .= '</div>';
+		$html .= theme('pager');
+	}
+	// ============================================
+	
+	$html .= '</div>';
+	return $html;
+}
+
+function search_render_tour($node, $total, $index) {
+	$html = '';
+	$thumbnail = image_style_url('tour_thumbnail', $node->field_thumbnail[LANGUAGE_NONE][0]['uri']);		
+	$klass = 'tour-item';
+	if ($index == $total - 1) $klass = 'tour-item last';
+	
+	$html .= '<div class="'.$klass.'" id="tour-item-'.$node->nid.'">
+	<div class=""><h2>'.l($node->title, 'node/'.$node->nid).'</h2>';
+  
+	$html .= '<div class="clear"></div>';
+	
+	if ($node->body['und'][0]['summary']) {
+		$body = $node->body[LANGUAGE_NONE][0]['summary'];	
+	} else {
+		$body = $node->body[LANGUAGE_NONE][0]['value'];
+	}
+	
+	$day_text = t("Day");
+	if ($node->field_day[LANGUAGE_NONE][0]['value'] > 1) {
+		$day_text = t("Days");
+	}
+	
+	$night_text = "Night";
+	if ($node->field_night[LANGUAGE_NONE][0]['value'] > 1) {
+		$night_text = t("Nights");
+	}
+	
+	$html .= '<div class="info">
+		<div class="thumbnail">'.l('<img src="'.$thumbnail.'" class="hotel-thumbnail"/>', 'node/'.$node->nid, array('html' => true)).'</div>
+		<div class="detail">
+			<span class="date">'.t('Duration').': '.$node->field_day[LANGUAGE_NONE][0]['value'].' '.$day_text.' / '.$node->field_night[LANGUAGE_NONE][0]['value'].' '.$night_text.'</span>';
+			if ($node->field_fast_fact) {
+				$html .= '<span>'.t('Fast Fact').': <font style="text-transform:none !important;">'.$node->field_fast_fact[LANGUAGE_NONE][0]['value'].'</font></span>';
+			}
+	$html .= $body;
+	
+	$node_path = drupal_get_path_alias('node/'.$node->nid);
+	
+	$html .= '<div class="button">'.l(t('Send Inquiry'), 'inquiry/'.$node_path, array('attributes' => array('class' => ''))).'</div>';
+	$html .= '<div class="button">'.l(t('View Tour'), 'node/'.$node->nid, array('attributes' => array('class' => ''))).'</div>';
+	
+	$html .= '</div></div>';
+	$html .= '</div></div>'; // hotel-item	
+	
+	return $html;
+}
+
+function search_render_hotel($node, $total, $index) {
+	$html = '';
+	$thumbnail = image_style_url('tour_thumbnail', $node->field_thumbnail[LANGUAGE_NONE][0]['uri']);		
+	$klass = 'hotel-item';
+	if ($index == $total - 1) $klass = 'hotel-item last';
+	
+	$html .= '<div class="'.$klass.'" id="hotel-item-'.$node->nid.'">
+	<div class=""><h2>'.l($node->title, 'node/'.$node->nid).'</h2>';
+	$html .= '<span class="class"> - '._hotel_class($node->field_star['und'][0]['value']).'</span>';
+  
+	if (isset($node->field_star)) {
+		$hotel_star = _hotel_star($node->field_star[LANGUAGE_NONE][0]['value']);		
+		for ($i = 0; $i < $hotel_star; $i++) {
+			if ($i == 0) $html .= '<span class="first star"></span>';
+			else $html .= '<span class="star"></span>';	
+		}
+	}
+	
+	$node_path = drupal_get_path_alias('node/'.$node->nid);
+	
+	$html .= '<div class="clear"></div>';
+	$html .= '<div class="detail">
+		<div class="thumbnail">'.l('<img src="'.$thumbnail.'" class="hotel-thumbnail"/>', 'node/'.$node->nid, array('html' => true)).'</div>
+		<div class="detail">'.$node->body['und'][0]['value'].'</div>';
+		
+	$html .= '<div class="button">'.l(t('Send Inquiry'), 'inquiry/'.$node_path, array('attributes' => array('class' => ''))).'</div>';
+	$html .= '<div class="button">'.l(t('View Hotel'), 'node/'.$node->nid, array('attributes' => array('class' => ''))).'</div>';
+	$html .= '</div>';
+		
+	$html .= '</div>';
+	$html .= '</div>'; // hotel-item
+	return $html;
+}
+
+/***********************************************
+Hotel list
+***********************************************/
+
+function hotels_page() {
+	$query = new EntityFieldQuery();
+	$hotels = $query->entityCondition('entity_type', 'node')
+	->entityCondition('bundle', 'hotel')
+	->propertyCondition('status', 1)
+	->pager(10)
+	->fieldOrderBy('field_star', 'value', 'DESC')
+	->execute();
+	
+	$nodes = node_load_multiple(array_keys($hotels['node']));
+	$html = '<div class="hotels-tab-content">';
+	$total = count($nodes);
+	$index = 0;
+	foreach ($nodes as $node) {
+		$node_path = drupal_get_path_alias('node/'.$node->nid);
+		
+		$thumbnail = image_style_url('tour_thumbnail', $node->field_thumbnail[LANGUAGE_NONE][0]['uri']);		
+		$klass = 'hotel-item';
+		if ($index == $total - 1) $klass = 'hotel-item last';
+		
+		$html .= '<div class="'.$klass.'" id="hotel-item-'.$node->nid.'">
+		<div class=""><h2>'.l($node->title, 'node/'.$node->nid).'</h2>';
+        $html .= '<span class="class"> - '._hotel_class($node->field_star['und'][0]['value']).'</span>';
+      
+        if ($node->field_star) {
+			$hotel_star = _hotel_star($node->field_star[LANGUAGE_NONE][0]['value']);		
+            for ($i = 0; $i < $hotel_star; $i++) {
+                if ($i == 0) $html .= '<span class="first star"></span>';
+                else $html .= '<span class="star"></span>';	
+            }
+        }
+		$html .= '<div class="address">'.$node->field_address['und'][0]['value'].'</div>';
+		$html .= '<div class="clear"></div>';
+		$html .= '<div class="info">
+			<div class="thumbnail">'.l('<img src="'.$thumbnail.'" class="hotel-thumbnail" />', 'node/'.$node->nid, array('html' => true)).'</div>
+			<div class="detail">'.$node->body['und'][0]['value'].'</div>';
+	
+		$html .= '<div class="button">'.l(t('Send Inquiry'), 'inquiry/'.$node_path, array('attributes' => array('class' => ''))).'</div>';
+		$html .= '<div class="button">'.l(t('View Hotel'), 'node/'.$node->nid, array('attributes' => array('class' => ''))).'</div>';
+		
+		$html .= '</div>';
+		
+		$html .= '</div>';
+		$html .= '</div>'; // hotel-item
+		$index++;
+	}
+	
+	$html .= '<div class="clear"></div>';
+	$html .= '</div>';
+	
+	$html .= theme('pager');
+	return $html;	
+}
+
+/***********************************************
+Inquire pages 
+***********************************************/
+
+function hgh_inquiries_info($id) {	
+	$sql = "SELECT * FROM {inquire} WHERE id = $id";
+	$query = db_query($sql);
+	
+	$header = array( 
+		array('data' => t('Inquiry Information ')),  
+		array('data' => t(' '))
+	);
+	
+	$node_path = "";
+	
+	$rows = array();
+	$node = false;
+	foreach ($query as $row) {
+		if (!$node) {
+			$node = node_load($row->nid);
+			$node_path = drupal_get_path_alias('node/'.$node->nid);
+		}
+		
+		$rows[0] = array(
+			array('data' => t('First Name').': ', 'class' => 'head'),
+			array('data' => $row->firstname)
+		);
+		$rows[1] = array(
+			array('data' => t('Last Name').': ', 'class' => 'head'),
+			array('data' => $row->lastname)
+		);
+		$rows[2] = array(
+			array('data' => t('Email').': ', 'class' => 'head'),
+			array('data' => $row->email)
+		);
+		$rows[3] = array(
+			array('data' => t('Phone').': ', 'class' => 'head'),
+			array('data' => $row->phone)
+		);
+		$rows[4] = array(
+			array('data' => t('Country').': ', 'class' => 'head'),
+			array('data' => $row->country)
+		);
+		
+		if ($node) {
+			// ================================
+			if ($node->type == "hotel") {
+				$rows[5] = array(
+					array('data' => t('Comments – Special Requests').': ', 'class' => 'head'),
+					array('data' => $row->comment)
+				);
+				$rows[6] = array(
+					array('data' => t('Hotel').': ', 'class' => 'head'),
+					array('data' => '<a href="http://www.hghtravel.com/'.$node_path.'">'.$node->title.'</a>')
+				);
+				$rows[7] = array(
+					array('data' => t('Date').': ', 'class' => 'head'),
+					array('data' => date('M d, Y - h:i:s', $row->created))
+				);
+			// ================================
+			} else if ($node->type == "tour") {
+				$rows[5] = array(
+					array('data' => t('Arrival Date').': ', 'class' => 'head'),
+					array('data' => $row->arrival)
+				);
+				$rows[6] = array(
+					array('data' => t('Estimated Duration').': ', 'class' => 'head'),
+					array('data' => $row->duration)
+				);
+				$rows[7] = array(
+					array('data' => t('Adults').': ', 'class' => 'head'),
+					array('data' => $row->adults)
+				);
+				$rows[8] = array(
+					array('data' => t('Children').': ', 'class' => 'head'),
+					array('data' => $row->children)
+				);
+				$rows[9] = array(
+					array('data' => t('Infants').': ', 'class' => 'head'),
+					array('data' => $row->infants)
+				);
+				$rows[10] = array(
+					array('data' => t('Language').': ', 'class' => 'head'),
+					array('data' => str_replace('-', ', ', $row->language))
+				);
+				$rows[11] = array(
+					array('data' => t('Accomodation').': ', 'class' => 'head'),
+					array('data' => $row->accomodation)
+				);
+				$rows[12] = array(
+					array('data' => t('Comments – Special Requests').': ', 'class' => 'head'),
+					array('data' => $row->comment)
+				);				
+				$rows[13] = array(
+					array('data' => t('Tour').': ', 'class' => 'head'),
+					array('data' => '<a href="http://www.hghtravel.com/'.$node_path.'">'.$node->title.'</a>')
+				);
+				$rows[14] = array(
+					array('data' => t('Date').': ', 'class' => 'head'),
+					array('data' => date('M d, Y - h:i:s', $row->created))
+				);
+			}
+		} else {
+			$rows[5] = array(
+				array('data' => t('Arrival Date').': ', 'class' => 'head'),
+				array('data' => $row->arrival)
+			);
+			$rows[6] = array(
+				array('data' => t('Estimated Duration').': ', 'class' => 'head'),
+				array('data' => $row->duration)
+			);
+			$rows[7] = array(
+				array('data' => t('Travel Inquiry').': ', 'class' => 'head'),
+				array('data' => $row->comment)
+			);
+			
+			$rows[8] = array(
+				array('data' => t('Date').': ', 'class' => 'head'),
+				array('data' => date('M d, Y - h:i:s', $row->created))
+			);
+		}
+	}
+	
+	/*
+	$css = '<style>
+		.page-admin-hgh-configurations-inquiries td.head {
+			width: 300px;	
+			font-weight: bold;
+		}
+	</style>';*/
+	return $css.theme('table', array('header' => $header, 'rows'=> $rows, 'caption' => ''));	
+}
+
+function hgh_inquiries() {
+	if (isset($_POST['inquiry-item'])) {		
+		$delete_id = array();
+		foreach($_POST['inquiry-item'] as $checkbox) {
+			if (is_numeric($checkbox)) {
+				$delete_id[] = $checkbox;
+			}
+		}
+		
+		$sql = "DELETE FROM {inquire} WHERE id IN(".implode(',', $delete_id).")";
+		$query = db_query($sql);
+	}
+	
+	$sql = "SELECT * FROM {inquire} ORDER BY created DESC";
+	$query = db_query($sql);
+	$rows = array();
+	$index = 0;
+	$header = array( 
+		array('data' => t('#')), 
+		array('data' => t('&nbsp;')),
+		array('data' => t('Name')), 
+		array('data' => t('Email')),
+		array('data' => t('Inquiry Item')),
+		array('data' => t('Country')),
+		array('data' => t('Date')),
+		array('data' => t('-'))
+	);
+	foreach ($query as $row) {
+		$n = node_load($row->nid);	
+		$rows[$index] = array(
+			array('data' => ($index+1)),
+			array('data' => '<input type="checkbox" id="inquiry_'.$row->id.'" name="inquiry-item[]" value="'.$row->id.'"  class="inquiry-checkbox"/>'),
+			array('data' => $row->firstname . ' ' . $row->lastname), 
+			array('data' => $row->email),
+			array('data' => l($n->title, 'node/'.$row->nid)),
+			array('data' => $row->country),
+			array('data' => date('M d, Y - h:i:s', $row->created)),
+			array('data' => l(t('View'), 'admin/hgh/configurations/inquiries/'.$row->id))
+		);
+		$index++;
+	}
+	
+	$button = '<input type="submit" value="'.t('Delete').'" class="inquiry-delete">';
+	return '<form method="post" name="inquiry-list" id="form-inquiry-list"><div class="inquires-list">'.$button.
+		theme('table', array('header' => $header, 'rows'=> $rows, 'caption' => '')).$button.'</div></form>';
+}
+
+function inquire_form() {
+	global $base_path;
+
+	drupal_add_library('system', 'ui.datepicker');
+	$theme_path = drupal_get_path('theme', 'adaptivetheme_hgh');
+	$module_path = drupal_get_path('module', 'hgh_travel');
+	drupal_add_js($theme_path . '/scripts/jquery.validate.pack.js');
+	drupal_add_js($module_path . '/hgh_travel.js');
+	
+	$path = drupal_lookup_path('source', arg(1).'/'.arg(2));
+	$nid = 0;
+	if ($path) {
+		$nid = str_replace('node/', '', $path);
+		$node = node_load($nid);
+	}
+	
+	$form = array();
+	if ($nid > 0) {
+		$form['header'] = array(
+			'#markup' => '<div class="form-header">'.t('INQUIRY FOR').' '.str_replace('-', ' ', strtoupper(arg(2))).'</div>',
+			'#weight' => -10,
+		);
+	} else {
+		$form['header'] = array(
+			'#markup' => '<div class="form-header">'.t('INQUIRY').'</div>',
+			'#weight' => -10,
+		);
+	}
+	
+	$form['nid'] = array(
+		'#type' => 'hidden',
+		'#weight' => 0,
+		'#default_value' => $nid
+	);
+	
+	$form['title'] = array(
+		'#type' => 'select',
+		'#title' => 'Title:', 
+		'#weight' => 2,
+		'#options' => drupal_map_assoc(array('Mr.', 'Ms.', 'Mrs.', 'Miss', 'Dr.', 'Prof.')),
+		'#DANGEROUS_SKIP_CHECK'	=>	true
+	);
+	
+	$form['first_name'] = array(
+		'#title' => t('First Name').': ',
+		'#type' => 'textfield',
+		'#weight' => 4,
+		'#required' => true
+	);
+	
+	$form['last_name'] = array(
+		'#title' => t('Last Name').': ',
+		'#type' => 'textfield',
+		'#weight' => 6,
+		'#required' => true
+	);
+	
+	$form['email'] = array(
+		'#title' => t('Email').': ',
+		'#type' => 'textfield',
+		'#weight' => 8,
+		'#required' => true
+	);
+	
+	$form['phone'] = array(
+		'#title' => t('Phone').': ',
+		'#type' => 'textfield',
+		'#weight' => 10
+	);
+	
+	$form['country'] = array(
+		'#title' => t('Country of Residence').': ',
+		'#type' => 'textfield',
+		'#weight' => 12,
+		'#required' => true
+	);
+	
+	if (!isset($node->type) || $node->type != "hotel") {
+		$form['arrival_date'] = array(
+			'#title' => t('Expected Arrival Date').': ',
+			'#type' => 'textfield',
+			'#weight' => 14,
+			'#required' => true,
+			'#attributes' => array('class' => array('date', 'pickadate'))
+		);
+		
+		$form['duration'] = array(
+			'#title' => t('Estimated Duration').': ',
+			'#type' => 'textfield',
+			'#weight' => 16,
+			'#required' => true
+		);
+	}
+	
+	if ($nid > 0) {
+		if ($node->type == "tour") {
+			$form['travellers'] = array(
+				'#type' => 'select',
+				'#title' => t('Number of Travellers').': ',
+				'#weight' => 18,
+				'#options' => drupal_map_assoc(array('1', '2', '3', '4', '5', '6', '7+')),
+				'#DANGEROUS_SKIP_CHECK'	=>	true,
+				'#required' => true,
+				'#default_value' => 1
+			);
+			
+			$form['children'] = array(
+				'#type' => 'select',
+				'#title' => t('Children').' (3-12 Yrs):', 
+				'#weight' => 20,
+				'#options' => drupal_map_assoc(array('0', '1', '2', '3', '4', '5')),
+				'#DANGEROUS_SKIP_CHECK'	=>	true,
+				'#required' => false,
+				'#default_value' => 0
+			);
+			
+			$form['infants'] = array(
+				'#type' => 'select',
+				'#title' => t('Infants').' (0-2 Yrs):', 
+				'#weight' => 22,
+				'#options' => drupal_map_assoc(array('0', '1', '2', '3', '4', '5')),
+				'#DANGEROUS_SKIP_CHECK'	=>	true,
+				'#default_value' => 0
+			);
+			
+			$form['language'] = array(
+				'#type' => 'checkboxes',
+				'#weight' => 24,
+				'#options' => drupal_map_assoc(array(t('English'), t('French'), t('Other'))),
+				'#title' => t('Language Selection for Tour guide:'),
+			);
+			
+			$form['language_other'] = array(
+				'#title' => '',
+				'#type' => 'textfield',
+				'#weight' => 26,
+				'#required' => false
+			);
+			
+			$form['clearfix'] = array(
+				'#markup' => '<div class="clear"></div>',
+				'#weight' => 28,
+			);
+			
+			$form['accomodation'] = array(
+				'#title' => t('What level of accommodation do you desire?'),
+				'#type' => 'radios',
+				'#weight' => 30,
+				'#required' => false,
+				'#options' => drupal_map_assoc(array('5 Star', '4 Star', '3 Star'))
+			);
+			
+			$form['clearfix_2'] = array(
+				'#markup' => '<div class="clear"></div>',
+				'#weight' => 32,
+			);
+		}
+	}
+	
+	if ($nid == 0) {	
+		$form['destinations'] = array(
+			'#title' => t('Your Preferred Destinations'),
+			'#type' => 'checkboxes',
+			'#weight' => 34,
+			'#required' => false,
+			'#options' => array('Vietnam' => t('Vietnam'), 'Cambodia' => t('Cambodia'), 'Laos' => t('Laos'), 'Myanmar' => t('Myanmar'), 'Thailand' => t('Thailand'))
+		);
+	}
+	
+	if ($nid > 0) {
+		$form['clearfix_2'] = array(
+			'#markup' => '<div class="clear"></div>
+			<div class="form-header optional-comment"'.t('OPTIONAL Comments – Special Requests').': </div>',
+			'#weight' => 36,
+		);
+	} else {
+		$form['clearfix_2'] = array(
+			'#markup' => '<div class="clear"></div>
+			<div class="form-header optional-comment">'.t('Your Travel Enquiry').'</div>',
+			'#weight' => 38,
+		);
+	}
+	
+	$form['request'] = array(
+		'#title' => '',
+		'#type' => 'textarea',
+		'#weight' => 40,
+		'#required' => false
+	);
+	
+	$form['submit'] = array(
+		'#type' => 'submit',
+		'#value' => t('Submit'),
+		"#weight" => 220,
+	);
+	
+	$form['#submit'][] = 'inquire_form_submit';
+	return $form;
+}
+
+function inquire_form_submit($form, $form_state) {
+	global $base_path;
+	$title = $form_state['values']['title'];
+	$first_name = $form_state['values']['first_name'];
+	$last_name = $form_state['values']['last_name'];
+	$email = $form_state['values']['email'];
+	$phone = $form_state['values']['phone'];
+	$country = $form_state['values']['country'];
+	$arrival_date = isset($form_state['values']['arrival_date']) ? $form_state['values']['arrival_date'] : "";
+	$duration = isset($form_state['values']['duration']) ? $form_state['values']['duration'] : "";
+	$travellers = isset($form_state['values']['travellers']) ? $form_state['values']['travellers'] : 0;
+	$children = isset($form_state['values']['children']) ? $form_state['values']['children'] : 0;
+	$infants = isset($form_state['values']['infants']) ? $form_state['values']['infants'] : 0;
+	
+	$language = array();
+	if (isset($form_state['values']['language']['English'])) {
+		if ($form_state['values']['language']['English'] != "") {
+			$language[] = $form_state['values']['language']['English'];
+		}
+	}
+	
+	if (isset($form_state['values']['language']['French'])) {
+		if ($form_state['values']['language']['French'] != "") {
+			$language[] = $form_state['values']['language']['French'];
+		}
+	}
+	
+	if (isset($form_state['values']['language']['Other'])) {
+		if ($form_state['values']['language']['Other'] != "") {
+			$language[] = $form_state['values']['language_other'];
+		}
+	}
+
+	$languague_selected = implode(',', $language);
+	
+	$accomodation = isset($form_state['values']['accomodation']) ? $form_state['values']['accomodation'] : "";
+	$request = $form_state['values']['request'];
+	$nid = $form_state['values']['nid'];
+	
+	$destinations = '';
+	if (isset($form_state['values']['destinations'])) {
+		foreach ($form_state['values']['destinations'] as $val) {
+			if ($val) {
+				$destinations .= $val .'-';	
+			}
+		}
+	}
+	
+	$id = db_insert('inquire')->fields(array(
+	    'title' => $title,
+    	'firstname' => $first_name,
+	    'lastname' => $last_name,
+		'email' => $email,
+		'phone' => $phone,
+		'country' => $country,
+		'arrival' => $arrival_date,
+		'duration' => $duration,
+		'adults' => ($travellers > 0) ? $travellers : 0,
+		'children' => ($children > 0) ? $children : 0,
+		'infants' => ($infants > 0) ? $infants : 0,
+		'language' => $languague_selected,
+		'accomodation' => ($accomodation) ? $accomodation : '',
+		'comment' => $request,
+		'nid' => $nid,
+		'destinations' => $destinations,
+		'created' => time()
+  	))->execute();
+	
+	$to = 'sales_online@hghue.com';
+	//$to = 'zeroxw@gmail.com';
+	//$to = 'cong.hg@gmail.com,zeroxw@gmail.com,sales_online@hghue.com,info@hghue.com';
+	$to = 'hghtravel@gmail.com';
+	$from = 'info@hghue.com';
+	
+	$params['subject'] = "Inquiry for HGH Travel from ".$first_name . " " . $last_name;
+	$params['message'] = "Someone has submit inquiry from HGHue site. To view this inquiry click 
+		<a href=\"".$base_path."admin/hgh/configurations/inquiries/".$id."\">here</a> (login required).";
+	
+	$params['message'] = hgh_inquiries_info($id);
+	
+	$message = drupal_mail('hgh_travel', 'inquiry', $to, language_default(), $params, $from, TRUE);
+	if ($message['send']) {
+   		// hgh_travel_spool_message($message);
+  	}
+	
+	drupal_goto("thank-you-your-enquiry");
+}
+
+function hgh_travel_mail($key, &$message, $params) {
+	global $base_path;
+	$language = $message['language'];
+	switch($key) {
+		case 'inquiry':
+			$message['subject'] = $params['subject'];
+			$message['body'][] = $params['message'];
+			//$message['headers']['Content-Type'] = 'text/html; charset=UTF-8; format=flowed';
+		break;
+	}
+}
+
+
+/***********************************************
+All destinations pages 
+***********************************************/
+
+function destinations_content($country) {
+	$type = arg(2);
+	$content = variable_get(ucwords($country).'-'.$type);
+	$content = $content['value'];
+	
+	switch($type) {
+		case "travel-guide": {
+			drupal_set_title(t("Travel Guide")." - ".ucwords($country));
+		} break;
+		
+		case "promotion": {
+			drupal_set_title(t("Promotion")." - ".ucwords($country));
+		} break;
+		
+		case "inspiration": {
+			drupal_set_title(t("Inspiration")." - ".ucwords($country));
+		} break;
+		
+		case "things-todo": {
+			drupal_set_title(t("Things To Do")." - ".ucwords($country));
+		} break;
+	}
+	
+	if ($content) return $content;
+	else drupal_goto();
+}
+
+function destinations_page() {
+	global $base_path, $language;
+
+	$destinations_path = $base_path.'destinations';
+	
+	// ---------------------
+	// process page argument
+	$country_arg = (arg(1) != "") ? arg(1) : '';
+	$city_arg = (arg(2) != "") ? arg(2) : '';
+	$overview = '';
+	
+	$country_arg_tid = 0;
+	$city_arg_tid = 0;
+	
+	$title_i18n = '';
+	// ---------------------
+	// get country term from argument
+	$country_term = taxonomy_get_term_by_name($country_arg);
+	if (count($country_term) > 0) {
+		foreach($country_term as $term) {
+			if (strtolower($term->name) == $country_arg) {
+				$country_arg_tid = $term->tid;
+				$overview = i18n_taxonomy_term_description($term, $language->language);
+				$title_i18n = i18n_taxonomy_term_name($term, $language->language);
+				drupal_set_title($title_i18n);
+				break;
+			}
+		}
+	}
+	
+	// ---------------------
+	// get city term from argument
+	$city_arg = str_replace('-', ' ', $city_arg);
+	$city_term = taxonomy_get_term_by_name($city_arg);
+	if (count($city_term) > 0) {
+		foreach($city_term as $term) {
+			if (strtolower($term->name) == $city_arg) {
+				$city_arg_tid = $term->tid;
+				$overview = $term->description;
+				$title_i18n = i18n_taxonomy_term_name($term, $language->language);
+				drupal_set_title($title_i18n);
+				break;
+			}
+		}
+	}
+	
+	// ---------------------
+	// switch display page type
+	$type = 'destinations';
+	// page title
+	$title = 'Destinations';
+	if ($city_arg_tid > 0) {
+		$type = 'city';
+		$title = $city_arg;
+	} else if ($country_arg_tid > 0) {
+		$type = 'country';	
+		$title = $country_arg;
+	}
+
+	if ($title_i18n) $title = $title_i18n;
+
+	/*
+	$destinations_views = views_get_view('destinations', TRUE);
+	$destinations_display = $destinations_views->execute_display('destinations', array($country_arg, $city_arg));
+	$items_count = $destinations_views->total_rows;
+	*/
+	//dpm($destinations_views);
+	
+	// -------------------------------------------------------------
+	// begin content
+	// -------------------------------------------------------------
+	$html = '<div class="destinations"><h1 id="page-title">'.$title.'</h1>';
+	
+	// ---------------------
+	// default over view
+	if ($type == 'destinations') {
+		$overview = variable_get('destinations_overview');
+		$overview = $overview['value'];
+	}
+
+	$html .= '<div class="overview">'.$overview.'</div>';
+	
+	// ---------------------------
+	// destinations page
+	// ---------------------------
+	if ($type == 'destinations') {
+		// --------------------
+		// our HGH
+		$country_voc = taxonomy_get_tree(2);
+		$country_tid = array();
+		$html .= '<div class="our-hgh">
+			<div class="tour-headline"><h4 class="em-caps">'.t('DESTINATIONS WE COVER').'</h4></div>';
+		$index = 0;
+		foreach ($country_voc as $term) {
+			if ($index == 0) $klass = 'first';
+			else $klass = '';
+			$country_tid[] = $term->tid;
+			$html .= '<span class="sign '.$klass.'"></span><a href="'.$destinations_path.'/'.strtolower($term->name).'" class="country">'.i18n_taxonomy_term_name($term, $language->language).'</a>';
+			$index++;
+		}
+		$html .= '<div class="clearfix"></div>';
+		$html .= '</div>'; // our-hgh
+		
+		// --------------------
+		// most popular cities
+		$city_voc = taxonomy_get_tree(3);
+		$index = 0;
+		$html .= '<div class="most-popular-cities">
+		<div class="tour-headline"><h4 class="em-caps">'.t('Most Popular Cities').'</h4></div>';
+		foreach ($city_voc as $term) {
+			if ($index == 0) $klass = 'first';
+			else $klass = '';
+			
+			$term_info = taxonomy_term_load($term->tid);
+			$city_name = strtolower($term->name);
+	
+			if ($term_info->field_most_popular[LANGUAGE_NONE][0]['value']) {
+				$country_name = taxonomy_term_load($term_info->field_country[LANGUAGE_NONE][0]['tid'])->name;
+				$html .= '<span class="sign '.$klass.'"></span><a href="'.$destinations_path.'/'.strtolower($country_name).'/'.strtolower($term_info->name).'" class="city">'.
+							i18n_taxonomy_term_name($term_info, $language->language).'</a>';
+				$index++;
+			}
+		}
+		$html .= '<div class="clearfix"></div>';
+		$html .= '</div>'; // most popular cities
+	}
+	
+	$country_array = array('vietnam', 'laos', 'thailand', 'myanmar', 'cambodia');
+	if (arg(0) == "destinations") {
+		if (in_array(arg(1), $country_array)) {
+			$html .= '<div class="destination-country">';
+			// ------------------
+			// Overview
+			$overview_array = array('hotels', 'tours', 'travel-guide', 'inspiration', 'thing-todo', 'prmotion');
+			if (arg(2) == "" || (arg(2) != "" && !in_array(arg(2), $overview_array)) && arg(3) == "") {
+				$html .= '<a href="'.$base_path.'destinations/'.arg(1).'#overview" class="overview active"><span>'.t('Overview').'</span></a>';
+			}
+			else $html .= '<a href="'.$base_path.'destinations/'.arg(1).'#overview" class="overview"><span>'.t('Overview').'</span></a>';
+			
+			// ------------------
+			// Tours
+			$tours_class = "";
+			$tours_link = $base_path.'destinations/'.arg(1).'/tours#list-all';
+			
+			if (arg(2) || arg(3)) {
+				if (arg(2) == "tours" && arg(3) != "tours") {
+					$html .= '<a href="'.$base_path.'destinations/'.arg(1).'/tours#list-all" class="tours active"><span>'.t('Tours').'</span></a>';
+				} else {
+					if (arg(3) == "tours") {
+						$html .= '<a href="'.$base_path.'destinations/'.arg(1).'/'.arg(2).'/tours#list-all" class="tours active"><span>'.t('Tours').'</span></a>';
+					} else {
+						if (arg(2) != 'tours' && arg(2) != 'hotels') 
+							$html .= '<a href="'.$base_path.'destinations/'.arg(1).'/'.arg(2).'/tours#list-all" class="tours"><span>'.t('Tours').'</span></a>';
+						else 
+							$html .= '<a href="'.$base_path.'destinations/'.arg(1).'/tours#list-all" class="tours"><span>'.t('Tours').'</span></a>';
+					}
+				}
+			} else $html .= '<a href="'.$base_path.'destinations/'.arg(1).'/tours#list-all" class="tours"><span>'.t('Tours').'</span></a>';
+			
+			// ------------------
+			// Hotels
+			if (arg(2) || arg(3)) {
+				if (arg(2) == "hotels" && arg(3) != "hotels") {
+					$html .= '<a href="'.$base_path.'destinations/'.arg(1).'/hotels#list-all" class="hotels active"><span>'.t('Hotels').'</span></a>';
+				} else {
+					if (arg(3) == "hotels") {
+						$html .= '<a href="'.$base_path.'destinations/'.arg(1).'/'.arg(2).'/hotels#list-all" class="hotels active"><span>'.t('Hotels').'</span></a>';
+					} else {
+						if (arg(2) != 'tours' && arg(2) != 'hotels') {
+							$html .= '<a href="'.$base_path.'destinations/'.arg(1).'/'.arg(2).'/hotels#list-all" class="hotels"><span>'.t('Hotels').'</span></a>';
+						} else {
+							$html .= '<a href="'.$base_path.'destinations/'.arg(1).'/hotels#list-all" class="hotels"><span>'.t('Hotels').'</span></a>';
+						}
+					}
+				}
+			} else $html .= '<a href="'.$base_path.'destinations/'.arg(1).'/hotels#list-all" class="hotels"><span>'.t('Hotels').'</span></a>';
+			
+			// ------------------
+			// Inspiration
+			if (arg(2) == "inspiration") $html .= '<a href="'.$base_path.'destinations/'.arg(1).'/inspiration" class="inspiration active"><span>'.t('Inspiration').'</span></a>';
+			else $html .= '<a href="'.$base_path.'destinations/'.arg(1).'/inspiration" class="inspiration"><span>'.t('Inspiration').'</span></a>';
+			
+			// ------------------
+			// Thing to do
+			if (arg(2) == "thing-todo") $html .= '<a href="'.$base_path.'destinations/'.arg(1).'/thing-todo" class="thing-todo active"><span>'.t('Thing To Do').'</span></a>';
+			else $html .= '<a href="'.$base_path.'destinations/'.arg(1).'/thing-todo" class="thing-todo"><span>'.t('Thing To Do').'</span></a>';
+			
+			// ------------------
+			// Travel guide
+			if (arg(2) == "travel-guide") $html .= '<a href="'.$base_path.'destinations/'.arg(1).'/travel-guide" class="travel-guide active"><span>'.t('Travel Guide').'</span></a>';
+			else $html .= '<a href="'.$base_path.'destinations/'.arg(1).'/travel-guide" class="travel-guide"><span>'.t('Travel Guide').'</span></a>';
+			
+			// ------------------
+			// Promotion
+			if (arg(2) == "promotion") $html .= '<a href="'.$base_path.'destinations/'.arg(1).'/promotion" class="promotion active"><span>'.t('Promotion').'</span></a>';
+			else $html .= '<a href="'.$base_path.'destinations/'.arg(1).'/promotion" class="promotion"><span>'.t('Promotion').'</span></a>';
+			
+			$html .= '</div><div class="clearfix"></div>';
+		}
+	}
+
+	// ---------------------------
+	// country
+	// ---------------------------
+	if ($type == 'country') {
+		$html .= '<div class="cities"><div class="tour-headline"><h4 class="em-caps">'.t('Cities').'</h4></div>';
+		// --------------------
+		// cities of country
+		$city_voc = taxonomy_get_tree(3);
+		$index = 0;
+		foreach ($city_voc as $term) {
+			if ($index == 0) $klass = 'first';
+			else $klass = '';
+			
+			$term_info = taxonomy_term_load($term->tid);
+			$city_name = strtolower($term->name);
+			if ($term_info->field_country) {
+				if ($term_info->field_country[LANGUAGE_NONE][0]['tid'] == $country_arg_tid) {
+					$country_name = taxonomy_term_load($term_info->field_country[LANGUAGE_NONE][0]['tid'])->name;
+					
+					if (arg(2) == "hotels") {
+						$html .= '<div class="item"><span class="sign '.$klass.'"></span>
+								<a href="'.$destinations_path.'/'.strtolower($country_name).'/'.strtolower(str_replace(' ', '-', $term_info->name)).'/hotels" class="city">'
+								.$term_info->name.'</a></div>';
+					} else {
+						$html .= '<div class="item"><span class="sign '.$klass.'"></span>
+								<a href="'.$destinations_path.'/'.strtolower($country_name).'/'.strtolower(str_replace(' ', '-', $term_info->name)).'" class="city">'
+								.$term_info->name.'</a></div>';	
+					}
+					$index++;
+				}
+			}
+		}
+		$html .= '<div class="clearfix"></div>';
+		$html .= '</div>'; // most popular cities
+	}
+	
+	// ---------------------------
+	// tour list
+	// ---------------------------
+	$all_tours_title = t("All Tours");	
+	$query = new EntityFieldQuery();
+	$type_sub = "tours";
+	switch ($type) {
+		case "destinations":
+			$featured_tours = $query->entityCondition('entity_type', 'node')
+			->entityCondition('bundle', 'tour')
+			->fieldCondition('field_feature', 'value', 1, '=')
+			->propertyCondition('status', 1)
+			// ->fieldCondition('field_country', 'tid', $country_tid, 'IN')
+			->execute();
+
+			// ---------------
+			// all tours
+			$query = new EntityFieldQuery();
+			$query->entityCondition('entity_type', 'node')
+			->fieldCondition('field_feature', 'value', 0, '=')
+			->propertyCondition('status', 1)
+			->entityCondition('bundle', 'tour');				
+			$all_tours_title = t('TOURS BY DESTINATIONS');
+		break;
+		
+		case "country":
+			$featured_tours = $query->entityCondition('entity_type', 'node')
+			->entityCondition('bundle', 'tour')
+			->propertyCondition('status', 1)
+			->fieldCondition('field_feature', 'value', 1, '=')
+			->fieldCondition('field_country', 'tid', $country_arg_tid, '=')->execute();	
+					
+			$query = new EntityFieldQuery();
+			if (arg(2) == "hotels") {
+				// all hotels
+				$query->entityCondition('entity_type', 'node')
+				->entityCondition('bundle', 'hotel')
+				->propertyCondition('status', 1)
+				->fieldCondition('field_country', 'tid', $country_arg_tid, '=');
+				
+				if (isset($country_name)) {
+					$all_tours_title = $country_name.' '.t('Hotels');
+				}
+				
+				$type_sub = "hotels";
+			} else {
+				// all tours	
+				$query->entityCondition('entity_type', 'node')
+				->entityCondition('bundle', 'tour')
+				->propertyCondition('status', 1)
+				->fieldCondition('field_feature', 'value', 0, '=')
+				->fieldCondition('field_country', 'tid', $country_arg_tid, '=');
+				
+				if (isset($country_name)) {
+					$all_tours_title = $country_name.' '.t('Tours');
+				}
+			}
+			
+		break;
+		
+		case "city":
+			$featured_tours = $query->entityCondition('entity_type', 'node')
+			->entityCondition('bundle', 'tour')
+			->propertyCondition('status', 1)
+			->fieldCondition('field_feature', 'value', 1, '=')
+			->fieldCondition('field_city', 'tid', $city_arg_tid, '=')->execute();
+			
+			if (arg(3) == "hotels") {
+				// all tours
+				$query = new EntityFieldQuery();
+				$query->entityCondition('entity_type', 'node')
+				->entityCondition('bundle', 'hotel')
+				->propertyCondition('status', 1)
+				->fieldCondition('field_city', 'tid', $city_arg_tid, '=');
+				
+				if (isset($city_arg)) {
+					$all_tours_title = ucwords($city_arg).' '.t('Hotels');
+				}
+				
+				$type_sub = "hotels";
+			} else {
+				// all tours
+				$query = new EntityFieldQuery();
+				$query->entityCondition('entity_type', 'node')
+				->entityCondition('bundle', 'tour')
+				->propertyCondition('status', 1)
+				->fieldCondition('field_feature', 'value', 0, '=')
+				->fieldCondition('field_city', 'tid', $city_arg_tid, '=');
+				
+				if (isset($city_arg)) {
+					$all_tours_title = ucwords($city_arg).' '.t('Tours');
+				}
+			}
+		break;
+	}
+	
+	// ========================================================
+	if (isset($featured_tours) || isset($all_tours)) {
+		// not display featured tours on hotels of country
+		if ($type_sub != "hotels" && isset($featured_tours['node'])) {
+			$nodes = node_load_multiple(array_keys($featured_tours['node']));
+			// --------------------
+			// featured tours
+			$html .= '<div class="tours-list featured-tours">
+				<div id="featured-tours-tab-content" class="tour-headline"><h4 class="em-caps">'.t('Featured Tours').'</h4></div>
+				<div class="clear"></div>';
+			
+			$html .= '<div class="content">';
+			
+			// ---------------------------------
+			// featured tours container wrapper
+			// ---------------------------------
+			$html .= '<div class="featured-tours-container featured-tours-tab-content">';
+			$html .= '<div class="contentSlidecontainer">
+			<div class="prevcontainer">
+				<div class="prev"> </div>
+			</div>
+			<div class="contentSlidewindow featured-content">
+			<div class="contentSlidewrapper" data-slidesperpage="2">';
+			foreach ($nodes as $node) {
+				$alias = drupal_get_path_alias('node/'.$node->nid);
+				$thumbnail = image_style_url('tour_thumbnail_medium', $node->field_thumbnail[LANGUAGE_NONE][0]['uri']);
+				$html .= '<div class="item contentSlide"><a href="'.$base_path.$alias.'">
+					<img src="'.$thumbnail.'" class="tour-thumbnail" /></a>
+					<div class="tour-title">'.l($node->title, 'node/'.$node->nid).'</div></div>';
+			}
+			
+			$html .= '</div>'; // contentSlidewrapper
+			$html .= '</div>'; // featured-content
+			
+			$html .= '<div class="nextcontainer"><div class="next"> </div></div>';
+			$html .= '<div class="clear"></div>
+					  <div class="pagingcontainer"></div>
+					  <div class="clear"></div>';
+			$html .= '</div>'; // contentSlidecontainer
+			$html .= '</div>'; // featured-tours-container
+
+			// ---------------------------------
+			// all tours
+			// ---------------------------------
+			/* disable All Tours Tab
+			$all_tours = $query->execute();
+			$nodes = node_load_multiple(array_keys($all_tours['node']));
+			
+			$html .= '<div class="all-tours-container all-tours-tab-content">';
+			$html .= '<div class="contentSlidecontainer">
+			<div class="prevcontainer">
+				<div class="prev"> </div>
+			</div>
+			<div class="contentSlidewindow featured-content">
+			<div class="contentSlidewrapper">';
+			foreach ($nodes as $node) {
+				$alias = drupal_get_path_alias('node/'.$node->nid);
+				$thumbnail = image_style_url('tour_thumbnail_medium', $node->field_thumbnail[LANGUAGE_NONE][0]['uri']);
+				$html .= '<div class="item contentSlide"><a href="'.$base_path.$alias.'"><img src="'.$thumbnail.'" class="tour-thumbnail" /></a>
+					<div class="tour-title">'.l($node->title, 'node/'.$node->nid).'</div></div>';
+			}
+			
+			$html .= '</div>'; // contentSlidewrapper
+			$html .= '</div>'; // featured-content
+			
+			$html .= '<div class="nextcontainer"><div class="next"> </div></div>';
+			$html .= '<div class="clear"></div><div class="pagingcontainer"></div><div class="clear"></div>';
+			
+			$html .= '</div>'; // contentSlidecontainer
+			$html .= '</div>'; // all-tours-tab-container
+			*/
+			// ---------------------------------
+			
+			$html .= '</div></div>'; // tours-list featured-tours
+		}
+		// ---------------------------------
+		// list of all tours
+		$all_tours = $query->pager('5')->execute();
+		
+		if (isset($all_tours['node'])) {
+			$nodes = node_load_multiple(array_keys($all_tours['node']));
+	
+			$html .= '<div class="clearfix"></div>';		
+			$html .= '<div class="list-all">
+			<div class="tour-headline"><h4 class="em-caps">'.$all_tours_title.'</h4></div>';
+			
+			// HOTELS 
+			if ($type_sub == 'hotels') {
+				foreach ($nodes as $node) {
+					$thumbnail = image_style_url('tour_thumbnail', $node->field_thumbnail[LANGUAGE_NONE][0]['uri']);		
+					$klass = 'item hotel-item';					
+					$html .= '<div class="'.$klass.'">';					
+					
+					$html .= '<div class="title-star">';
+					$html .= '<span class="title">'.l($node->title, 'node/'.$node->nid).'</span>';					
+					$html .= '<span class="class"> - '._hotel_class($node->field_star['und'][0]['value']).'</span>';
+				  
+					if (isset($node->field_star)) {
+						$hotel_star = _hotel_star($node->field_star[LANGUAGE_NONE][0]['value']);					
+						for ($i = 0; $i < $hotel_star; $i++) {
+							if ($i == 0) $html .= '<span class="first star"></span>';
+							else $html .= '<span class="star"></span>';	
+						}
+					}
+					
+					$html .= '</div>';
+					$html .= '<div class="address">'.$node->field_address['und'][0]['value'].'</div>';
+					$html .= '<div class="thumbnail">'.l('<img src="'.$thumbnail.'" class="hotel-thumbnail" />', 'node/'.$node->nid, array('html' => true)).'</div>';
+					
+					$html .= '<div class="tour-info">';
+
+					$body = $node->body['und'][0]['value'];
+					if (isset($node->body[$language->language][0]['value'])) {
+						$body = $node->body[$language->language][0]['value'];
+					}
+					$html .= '<div class="detail">'.$body.'</div>';
+					$html .= '</div>';
+					
+					$html .= '</div>'; // hotel-item
+					$html .= '<div class="hr"></div>';
+				}
+			} else {
+				// TOURS
+				foreach($nodes as $node) {
+					$alias = drupal_get_path_alias('node/'.$node->nid);
+					$thumbnail = image_style_url('tour_thumbnail', $node->field_thumbnail[LANGUAGE_NONE][0]['uri']);
+					 
+					$html .= '<div class="item">
+						<div class="thumbnail"><a class="title" href="'.$base_path.$alias.'"><img src="'.$thumbnail.'" class="tour-thumbnail" /></a></div>
+						<div class="tour-info">
+							'.l($node->title, 'node/'.$node->nid, array('attributes' => array('class' => 'title'))).'
+							<span class="duration">'.t('Duration').': ';
+					
+					$days = 'DAY';
+					$nights = 'NIGHT';
+					if ($node->field_day[LANGUAGE_NONE][0]['value'] > 1) {
+						$days .= 'S';	
+					}
+					if ($node->field_day[LANGUAGE_NONE][0]['value'] > 1) {
+						$nights .= 'S';	
+					}
+					
+					$html .= $node->field_day[LANGUAGE_NONE][0]['value'].' '. $days.'/'.$node->field_night[LANGUAGE_NONE][0]['value'].' '. $nights .'</span>';
+					
+					$term_info = taxonomy_term_load($node->field_style[LANGUAGE_NONE][0]['tid']);
+					
+					$html .= '<span class="style">'.t('STYLE').': '.$term_info->name.'</span>';
+					
+					$summary = $node->body['und'][0]['summary'];
+					if (isset($node->body[$language->language][0]['summary'])) {
+						$summary = $node->body[$language->language][0]['summary'];
+					}
+
+					if ($summary) {
+						$html .= '<div class="overview">'.$summary.'</div>';
+					} else {
+						$body = $node->body['und'][0]['value'];
+						if (isset($node->body[$language->language][0]['value'])) {
+							$body = $node->body[$language->language][0]['value'];
+						}
+
+						$html .= '<div class="overview">'.short_teaser($body).'</div>';
+					}
+					
+					$html .= '<div class="button"><a href="'.$base_path.'inquiry/'.$alias.'" class="btn orange-btn" target="_blank;" >&nbsp;'.t('INQUIRE').'&nbsp;</a>
+					<a class="view-link" target="_blank;" href="'.$base_path.$alias.'">'.t('VIEW TOUR').'<span class="readmore"></span></a></div>';
+					$html .= '<div class="clear"></div>';
+					$html .= '</div>'; // tour-info
+					$html .= '</div>'; // item
+					 
+					$html .= '<div class="hr"></div>';
+				}
+			}
+			
+			$html .= theme('pager');
+			$html .= '</div>';
+		}
+	}
+	
+	// ======================================
+	$html .= '</div>'; //destinations
+	return $html;
+}
+
+/***********************************************
+All tours pages 
+***********************************************/
+function tours_page() {
+	global $base_path, $language;
+	$destinations_path = $base_path.'destinations';
+	
+	$overview = variable_get('tours_overview');
+	$html = '<div class="tours-page">';
+	// $html .= '<h1>'.t('Tour In Asia').'</h1>';
+	$html .= '<div class="overview">'.$overview['value'].'</div>';
+	$html .= '<div class="explore-tours">
+	<div class="tour-headline"><h4 class="em-caps">'.t('Explore Tours by Country').'</h4></div>';
+	
+	// --------------------
+	// our HGH
+	$country_voc = taxonomy_get_tree(2);
+	$country_tid = array();
+	$index = 0;
+	foreach ($country_voc as $term) {
+		if ($index == 0) $klass = 'first';
+		else $klass = '';
+		$country_tid[] = $term->tid;
+		$html .= '<span class="sign '.$klass.'"></span><a href="'.$destinations_path.'/'.strtolower($term->name).'" class="country">'.i18n_taxonomy_term_name($term, $language->language).'</a>';
+		$index++;
+	}
+	
+	$html .= '<div class="clearfix"></div>';
+	$html .= '</div>'; // explore-tours
+	
+	$query = new EntityFieldQuery();
+	$featured_tours = $query->entityCondition('entity_type', 'node')
+	->entityCondition('bundle', 'tour')
+	->fieldCondition('field_feature', 'value', 1, '=')
+	->fieldCondition('field_country', 'tid', $country_tid, 'IN')->execute();
+	
+	if (count($featured_tours)) {	
+		$nodes = node_load_multiple(array_keys($featured_tours['node']));
+		// --------------------
+		// featured tours
+		$html .= '<div class="featured-tours">
+			<div class="tabs">
+				<div id="overview-tab-content" class="tour-headline"><h4 class="em-caps">'.t('Featured Tours').'</h4></div>
+				<div class="clear"></div>
+			</div>';
+		
+		$html .= '<div class="content">';
+		$html .= '<div class="contentSlidecontainer">
+		<div class="prevcontainer">
+			<div class="prev"> </div>
+		</div>
+		<div class="contentSlidewindow featured-content">
+		<div class="contentSlidewrapper">';
+		
+		foreach ($nodes as $node) {
+			$alias = drupal_get_path_alias('node/'.$node->nid);
+			$thumbnail = image_style_url('tour_thumbnail_medium', $node->field_thumbnail[LANGUAGE_NONE][0]['uri']);
+			$html .= '<div class="item contentSlide"><a href="'.$base_path.$alias.'"><img src="'.$thumbnail.'" class="tour-thumbnail" /></a>
+				<div class="tour-title">'.l($node->title, 'node/'.$node->nid).'</div></div>';
+		}
+				
+		$html .= '</div>'; // contentSlidewrapper
+		$html .= '</div>'; // featured-content
+		$html .= '<div class="nextcontainer"><div class="next"> </div>';
+		$html .= '</div>'; // contentSlidecontainer
+		$html .= '<div class="clear"></div><div class="pagingcontainer"></div><div class="clear"></div></div>
+		</div><div class="clear"></div>';
+		
+		$html .= '</div>'; // featured tours
+	}
+	
+	// all tours
+	$page = 1;
+	if (isset($_GET['page'])) $page = $_GET['page'];
+	$query = new EntityFieldQuery();
+	$all_tours = $query->entityCondition('entity_type', 'node')
+	->propertyCondition('status', 1)
+	//->propertyOrderBy('created', 'DESC')
+	//->range(0, 15)
+	//->range(($page - 1) * 15, 15)
+	->pager(15)
+	->entityCondition('bundle', 'tour')
+	->fieldOrderBy('field_day', 'value', 'DESC')
+	->execute();
+	
+	$tours_title = 'Tour Directory';	
+	$nodes = node_load_multiple(array_keys($all_tours['node']));
+	$header = array( 
+		array('data' => t('TOUR'), 'class' => 'name'),  
+		array('data' => t('DURATION'), 'class' => 'duration'),
+		array('data' => t('STYLE'), 'class' => 'style'),
+	);
+	
+	$rows = array();
+	foreach($nodes as $node) {
+		$days = t('DAY');
+		$nights = t('NIGHT');
+		
+		$day_number = $node->field_day[LANGUAGE_NONE][0]['value'];
+		if ($day_number == 0) {
+			$day_number = t('HALF DAY');
+			$days = '';
+		}
+		
+		if ($node->field_day[LANGUAGE_NONE][0]['value'] > 1) {
+			$days .= 'S';	
+		}
+		
+		if ($node->field_night[LANGUAGE_NONE][0]['value'] > 1) {
+			$nights .= 'S';	
+		}
+		
+		$term_info = taxonomy_term_load($node->field_style[LANGUAGE_NONE][0]['tid']);
+		$alias = drupal_get_path_alias('node/'.$node->nid);	
+		
+		$rows[] = array(
+			array('data' => l($node->title, 'node/'.$node->nid, array('attributes' => array('class' => 'name'))), 'class' => 'title'),
+			array('data' => $day_number.' '. $days.'/'.$node->field_night[LANGUAGE_NONE][0]['value'].' '. $nights, 'class' => 'duration'),
+			array('data' => i18n_taxonomy_term_name($term_info, $language->language), 'class' => 'style'),
+		);
+	}
+	
+	$html .= theme('table', array('header' => $header, 'rows'=> $rows, 'caption' => t('Tour Directory'), 'attributes' => array('class' => array('tours-list'))));	
+	
+	$html .= theme('pager');
+	// end of page
+	$html .= '</div>'; // tours-page
+	
+	return $html;
+}
+
+
+/***********************************************
+HGH Configurations
+***********************************************/
+function hgh_configurations() {
+	$output = drupal_get_form('hgh_configurations_admin');
+	$html = drupal_render($output);
+	return $html;
+}
+
+function hgh_configurations_admin() {
+	$form = array();
+	
+	$defaults = array(
+		'value' => '',
+		'format' => filter_default_format(),
+	);
+	
+	$destinations_overview = variable_get('destinations_overview', $defaults);
+	$form['destinations_overview'] = array(
+		'#title' => 'Destinations Overview',
+		'#weight' => 0,
+		'#description' => t('Destinations Overview text description'),
+		'#default_value' => $destinations_overview['value'],
+		'#type' => 'text_format',
+		'#rows' => 15,
+		'#format' => $destinations_overview['format']
+	);
+		
+	$defaults = array(
+		'value' => '',
+		'format' => filter_default_format(),
+	);
+	
+	$tours_overview = variable_get('tours_overview', $defaults);
+	$form['tours_overview'] = array(
+		'#title' => 'Tours Overview',
+		'#weight' => 10,
+		'#description' => t('Tours Overview text description'),
+		'#default_value' => $tours_overview['value'],
+		'#type' => 'text_format',
+		'#rows' => 15,
+		'#format' => $tours_overview['format']
+	);
+	
+	return system_settings_form($form);	
+}
+
+function hgh_configurations_destinations_information() {
+	$output = drupal_get_form('destinations_information_admin');
+	$html = drupal_render($output);
+	return $html;
+}
+
+function destinations_information_admin() {
+	$form = array();
+	
+	$weight = 0;	
+	$country_voc = taxonomy_get_tree(2);
+	
+	$allow = array('promotion', 'things-todo', 'inspirations', 'travel-guide');
+		
+	if (in_array(arg(4), $allow)) {
+		$title = ucwords(arg(4));
+		if (arg(4) == 'things-todo') $title = t('Things To Do');
+		if (arg(4) == 'travel-guide') $title = t('Travel Guide');
+			
+		foreach($country_voc as $term) {
+			
+			$defaults = array(
+				'value' => '',
+				'format' => filter_default_format(),
+			);
+			
+			$format = variable_get($term->name.'-'.arg(4), $defaults);
+			
+			$form[$term->name.'-'.arg(4)] = array(
+				'#title' => $term->name .' '.$title,
+				'#format'=>'full_html',
+				'#type' => 'text_format',
+				'#weight' => $weight,
+				'#description' => '',
+				'#default_value' => $format['value'],
+				'#type' => 'text_format',
+				'#rows' => 15,
+				'#format' => $format['format']
+			);
+				
+			$weight += 10;
+		}
+		
+		return system_settings_form($form);
+	} else {
+		drupal_goto();	
+	}
+}
+
+function _hotel_star($s) {
+	if ($s == 6 || $s == 5) $s--;
+	return $s;
+}
+
+function _hotel_class($class) {
+	// list of value doesn't allow exist value, use 10 for deluxe (will be converted to 4)
+	$class_array = array(t('Luxury') => 6, t('Deluxe') => 5, t('Villa') => 4, t('Good Value') => 3, t('Homestay') => 0);
+	$class_array = array_flip($class_array);
+	return ($class_array[$class]);
+}
+
+function _hotel_class_text($selected_type) {
+	$class_array = array('luxury' => 6, 'deluxe' => 5, 'villa' => 4, 'good value' => 3, 'homestay' => 0);
+	return $class_array[$selected_type];
+}

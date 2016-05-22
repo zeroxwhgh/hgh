@@ -1,0 +1,20 @@
+.footer-content .contact > div {
+	float: left;
+}
+
+.footer-content .contact .yahoo {
+	margin-right: 10px;
+}
+
+.footer-content .partner-logo {
+	background: none repeat scroll 0 0 #FFFFFF;
+    border-radius: 6px;
+    padding: 0 10px;
+    margin-top: 4px;
+}
+
+.footer-content .partner-logo-title {
+	margin-top: 10px;
+	font-weight: bold;
+	text-transform: uppercase;
+}

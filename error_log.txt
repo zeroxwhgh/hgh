@@ -1,0 +1,1 @@
+[14-Feb-2014 00:08:26] PHP Fatal error:  Call to undefined function  date_default_timezone() in /home/hghue/public_html/sites/all/modules/date/date_popup/date_popup.module on line 203

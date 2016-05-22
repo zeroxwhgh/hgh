@@ -1,0 +1,19 @@
+<?php
+
+function GetGooglLink($FullURL) {
+	$query = db_query("SELECT * FROM {Googl} WHERE FullURL = '$FullURL'");
+	
+	foreach ($query as $row) {
+		if ($row->ShortURL) {
+			return $url->ShortURL;
+		} else {
+			include_once "Googl.class.php";
+			$googl = new Googl("AIzaSyDddofexB3yzTM3DF5tJfkP1Qr7dUMrSek");
+			$shortURL = $googl->shorten($FullURL);
+			if (strpos($shortURL, 'http://goo.gl') === 0) {
+				db_query("INSERT INTO {Googl} VALUES('%s', '%s')", $FullURL, $shortURL);
+			}
+			return $shortURL;
+		}
+	}
+}

