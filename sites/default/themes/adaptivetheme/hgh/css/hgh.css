@@ -2777,6 +2777,18 @@ ul.menu.primary-menu {
     display: none !important;
 }
 
+#primary-menu-bar ul li.active.menu-1571 a {
+    background: none !important;
+    color: #222 !important;
+    border-bottom: 3px solid transparent !important;
+}
+
+#primary-menu-bar ul li.active.menu-1571 a:hover {
+    background: #f9f9f9 none repeat scroll 0 0 !important;
+    color: #009ee1 !important;
+    border-bottom: 3px solid #ecb53f !important;
+}
+
 /* -------------- */
 @media screen and (min-width: 769px) and (max-width: 1140px) {
     #site-slogan {
