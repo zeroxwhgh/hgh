@@ -297,6 +297,18 @@ function adaptivetheme_hgh_preprocess_page(&$vars) {
 	}
 
 	dpm($vars);
+
+	if (!empty($vars['page']['sidebar_first']) && !empty($vars['page']['sidebar_second'])) {
+		$vars['content_column_class'] = ' class="col-sm-4"';
+	}
+	elseif (!empty($vars['page']['sidebar_first']) || !empty($vars['page']['sidebar_second'])) {
+		$vars['content_column_class'] = ' class="col-sm-9 col-xs-12"';
+	}
+
+	else {
+		$vars['content_column_class'] = ' class="col-sm-12"';
+	}
+
 	// ----------------
 	// classes for bootstrap responsive theme
 	// $vars['header_attributes_array']['class'][] = 'container';
@@ -309,12 +321,13 @@ function _images_slider($type, $home_nid = NULL) {
 	global $base_path, $language;
 	$theme_path = drupal_get_path('theme', 'adaptivetheme_hgh');
 	
-	if ($type != "") $slider  = '<div id="images-slider"><div class="slider-container">';
+	if ($type != "") $slider  = '<div id="images-slider"><div class="slider-container cycle-slideshow" data-cycle-pager-template="<li><a href=#>{{slideNum}}</a></li>">';
 	else $slider = '';
 	$exist = false;
 
 	switch ($type) { 
 		case 'home': {
+			$slider .= '<div class="cycle-pager"></div>';
 			$node_home = node_load($home_nid);
 
 			if (isset($node_home->field_feature_images[LANGUAGE_NONE])) {

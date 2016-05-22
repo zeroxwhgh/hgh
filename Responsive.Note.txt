@@ -2,3 +2,7 @@ Note
 -------------
 1. Move slider into new region: Slider
 2. Disable home menu
+3. Edit homepage and add boostrap classes
+4. Move search from Content Top to Content, remove Top content region
+5. Move Tabbed content to bottom of content, remove Bottom content region
+6. Remove block Why Us? on second sidebar

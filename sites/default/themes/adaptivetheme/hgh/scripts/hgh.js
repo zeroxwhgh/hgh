@@ -53,6 +53,7 @@
             iPod: /iPod/i.test(userAgent)
         };
 		
+		/*
 		$('#images-slider').slides({ 
 			container : 'slider-container',
 			start : 1,
@@ -67,7 +68,7 @@
 			slidesLoaded: function() {
 				sliderSetCaption();
 			}
-		});
+		});*/
         
 		paginate_slider();
 		main_menu();
@@ -82,7 +83,7 @@
 			if (window.location.hash) {
 				jQuery('html,body').animate({scrollTop: jQuery(window.location.hash.replace('#', '.')).offset().top}, 'slow');	
 			} else {
-				jQuery('html,body').animate({scrollTop: jQuery("#columns").offset().top - 100}, 'slow');	
+				jQuery('html,body').animate({scrollTop: jQuery("#system-main").offset().top - 100}, 'slow');	
 			}
 		}
 		
@@ -728,6 +729,23 @@
 	    jQuery(document).snowfall('clear');
 	    jQuery(document).snowfall({shadow : true, round : true,  minSize: 5, maxSize:8}); // add shadows
 	    */
+
+	    jQuery('.mobile-menu').click(function(e) {
+	    	if (jQuery('#primary-menu-bar').css('display') == "none") {
+	    		jQuery('#primary-menu-bar').slideDown();
+	    	} else {
+	    		jQuery('#primary-menu-bar').slideUp();
+	    	}
+	    });
+
+	    // close menu when click outside
+	    jQuery('.mobile-menu').click(function(event) {
+			jQuery('html').one('click',function() {
+				jQuery('#primary-menu-bar').slideUp();	
+			});
+
+			event.stopPropagation();
+		});
 	});
 })(jQuery);
 

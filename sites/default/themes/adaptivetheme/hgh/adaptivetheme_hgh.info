@@ -65,7 +65,7 @@
   ; following as a guide:
 
   ; ie_scripts[lte IE 8][] = js/my-script.js
-  scripts[] = scripts/slides.min.jquery.js
+  ;scripts[] = scripts/slides.min.jquery.js
   scripts[] = scripts/jquery.shadow.js
   ;scripts[] = scripts/jquery.corner.js
   ;scripts[] = scripts/jquery.serialScroll-1.2.2-min.js
@@ -73,6 +73,7 @@
   scripts[] = scripts/gmap.js
   scripts[] = scripts/bootstrap.min.js
   scripts[] = scripts/snowfall.jquery.min.js
+  scripts[] = scripts/jquery.cycle2.min.js
   
   ;scripts[] = scripts/jquery.cookie.js
 
@@ -85,12 +86,8 @@
   regions[content_top]       = Main Content Top
   regions[content]           = Main Content
   regions[content_bottom]    = Main Content Bottom
-  regions[secondary_content] = Secondary
   regions[footer]            = Footer  
-  regions[page_top]          = Page top
-  regions[page_bottom]       = Page bottom
   
-
   ;----------// Gpanel Regions
   ; If you are using Gpanels copy and paste the region definitions here. You
   ; will find them in each layout PHP file in adaptivetheme/layouts/gpanels
