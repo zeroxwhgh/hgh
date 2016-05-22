@@ -321,7 +321,8 @@ function _images_slider($type, $home_nid = NULL) {
 	global $base_path, $language;
 	$theme_path = drupal_get_path('theme', 'adaptivetheme_hgh');
 	
-	if ($type != "") $slider  = '<div id="images-slider"><div class="slider-container cycle-slideshow" data-cycle-pager-template="<li><a href=#>{{slideNum}}</a></li>">';
+	if ($type != "") $slider  = '<div id="images-slider">
+		<div class="slider-container cycle-slideshow" data-cycle-pager-template="<li><a href=#>{{slideNum}}</a></li>" data-cycle-loader="true">';
 	else $slider = '';
 	$exist = false;
 
