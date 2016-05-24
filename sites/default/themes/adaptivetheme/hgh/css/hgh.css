@@ -379,9 +379,7 @@ border-radius: 0 !important;
 =================== */
 
 #block-custom-blocks-main-menu-items {
-    float: left;
     margin: 0 auto;
-    width: 1000px;
 }
 #block-custom-blocks-main-menu-items .block-inner {
     margin: 0 !important;
@@ -392,14 +390,10 @@ border-radius: 0 !important;
 }
 #links-menu .links-list {
     /*background:url("../images/transparent.png") repeat scroll 0 0 transparent;*/
-
-background: linear-gradient(to top, rgba(27, 27, 27, 0.15), rgba(255, 255, 255, 0.15) 15%) repeat scroll 0 0 #fff !important;
-    width: 1000px;
+    background: linear-gradient(to top, rgba(27, 27, 27, 0.15), rgba(255, 255, 255, 0.15) 15%) repeat scroll 0 0 #fff !important;
     /*padding:0 20px 10px;*/
-
-margin: 5px auto 0;
+    margin: 5px auto 0;
     display: none;
-    z-index: 1000;
     border-radius: 0px 0px 4px 4px !important;
     border: 5px solid #eee;
     /*
@@ -433,30 +427,20 @@ padding: 10px 20px;
 
 /*background-color: rgba(249, 249, 249, 0.7);*/
 
-float: left;
+    float: left;
     margin-top: 1px;
     width: 100%;
-    padding: 8px 0;
     border-bottom: 1px dotted #ebebeb;
 }
 #links-menu .links-list .link-item: last-child {
     border: none !important;
 }
-#links-menu .column-left {
-    float: left;
-    width: 640px;
+#links-menu .column-left {  
 }
 #links-menu .column-right {
-    float: left;
-    width: 260px;
-    margin-left: 30px;
 }
-#links-menu .links-list .link-item .thumbnail {
-    float: left;
-    /*margin-left: 10px;*/
-
-margin-top: 2px;
-    width: 90px !important;
+#links-menu .links-list .link-item img .thumbnail {
+    margin-top: 2px;
     margin-right: 10px;
     background: none !important;
     border: none !important;
@@ -466,10 +450,10 @@ margin-top: 2px;
 }
 #links-menu .links-list .link-item .thumbnail img {
     border: 1px solid #666666;
+    width: 80%;
 }
 #links-menu .links-list .link-item .links-info {
-    float: left;
-    width: 540px;
+ 
 }
 #links-menu .links-list .link-item .links-info .name {
     /*font-family:'Carrois Gothic SC',sans-serif;*/
@@ -484,18 +468,28 @@ font-size: 12px;
     color: #1b75bb;
 }
 #links-menu .links-list .link-item .links-info .pages {} #links-menu .links-list .link-item .links-info ul {
-    float: left;
     margin: 0;
-    width: 100%;
-    padding-left: 20px;
 }
 #links-menu .links-list .link-item .links-info ul li {
-    float: left;
+    float: none;
+    display: inline-block;
     line-height: 14px;
     list-style: disc outside none;
     margin-left: 10px;
     padding: 0;
     color: #333;
+}
+
+.country-item > .thumbnail {
+    border: medium none !important;
+    box-shadow: none !important;
+    margin-bottom: 0 !important;
+}
+
+.country-item > .thumbnail > .thumbnail {
+    margin-bottom: 0;
+    border-radius: 0;
+    padding: 0;
 }
 #desinations-list .links-info ul li {
     width: 200px !important;
@@ -572,7 +566,12 @@ font-size: 12px;
 }
 #desinations-list, #tours-list {
     position: relative;
-    top: 37px;
+    z-index: 99999 !important;
+    margin-top: 0 !important;
+}
+
+#branding .main-menu #menu-bar {
+    margin-top: 0 !important;
 }
 /* main content */
 
@@ -2811,7 +2810,7 @@ ul.menu.primary-menu {
     text-align: right;
     padding-right: 20px;
     position: absolute;
-    z-index: 99999;
+    z-index: 999;
     color: #fff;
     bottom: 7px;
     right: 20px;
@@ -2881,8 +2880,7 @@ ul.menu.primary-menu {
     }
 }
 
-/* tablet */
-@media screen and (min-width: 480px) and (max-width: 767px) {
+@media screen and (min-width: 481px) and (max-width: 767px) {
     #logo {
         margin-left: 2%;
         width: 13%;
@@ -2913,6 +2911,23 @@ ul.menu.primary-menu {
 
     .language-icons a {
         background-size: 80% !important;
+    }
+
+    .region-sidebar-first, .region-sidebar-second {
+        float: none;
+    }
+
+    .explore-map a {
+        display: block;
+        margin-bottom: 10px;
+    }
+
+    #block-views-feedback-block .views-row {
+        width: 100%;
+    }
+
+    #block-views-feedback-block .view-content {
+        height: auto;
     }
 }
 
@@ -3041,8 +3056,14 @@ ul.menu.primary-menu {
         margin-left: 0;
         margin-right: 0;
     }
+
+    .explore-map a {
+        display: block;
+        margin-bottom: 10px;
+    }
+
 }
 
-@media screen and (max-width: 320px) {
+@media screen and (min-width: 481px) and (max-width: 767px) {
     
 }

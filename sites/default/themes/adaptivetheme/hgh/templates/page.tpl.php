@@ -173,11 +173,6 @@
             <?php if ($page['content_top']): ?>
             <div class="content-top"><?php print render($page['content_top']); ?></div>
             <?php endif; ?>
-            
-             <!-- sidebar first -->
-            <aside class="col-xs-12 col-sm-3 col-md-3" role="complementary">
-                <?php print render($page['sidebar_first']); ?>
-            </aside>
 
             <section<?php print $content_column_class; ?>>
                 <a id="main-content"></a>
@@ -192,6 +187,11 @@
                 <?php endif; ?>
             </section>
 
+            <!-- sidebar first -->
+            <aside class="col-xs-12 col-sm-3 col-md-3" role="complementary">
+                <?php print render($page['sidebar_first']); ?>
+            </aside>
+            
            <?php
            /*
            <!-- sidebar second -->
